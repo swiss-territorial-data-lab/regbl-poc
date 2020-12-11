@@ -71,6 +71,8 @@
     header - type definition
  */
 
+    typedef std::vector< std::vector< std::vector< double > > > regbl_component_t;
+
 /*
     header - structures
  */
@@ -81,11 +83,17 @@
 
     int regbl_io_state( cv::Mat & regbl_image, int regbl_state, std::string regbl_path );
 
+    void regbl_tool_equalize( cv::Mat & regbl_in );
+
     void regbl_process_extract_black( cv::Mat & regbl_in, cv::Mat & regbl_out, int const regbl_l2dist );
 
     int regbl_process_conway_iteration( cv::Mat & regbl_in, cv::Mat & regbl_out, int const regbl_gamevalue );
 
+    regbl_component_t regbl_extract_connected( cv::Mat & regbl_in );
+
     void regbl_process_pca_filtering( cv::Mat & regbl_in, cv::Mat & regbl_out );
+
+    regbl_component_t regbl_filter_pca( regbl_component_t & regbl_in, double const regbl_ratio );
 
     int main( int argc, char ** argv );
 
