@@ -79,7 +79,7 @@
     header - function prototypes
  */
 
-    int regbl_io_state( cv::Mat & regbl_image, int regbl_state, std::string & regbl_path );
+    int regbl_io_state( cv::Mat & regbl_image, int regbl_state, std::string regbl_path );
 
     void regbl_process_extract_black( cv::Mat & regbl_in, cv::Mat & regbl_out, int const regbl_l2dist );
 

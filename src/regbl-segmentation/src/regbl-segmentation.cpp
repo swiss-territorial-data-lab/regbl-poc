@@ -25,10 +25,10 @@
     source - i/o methods
  */
 
-    int regbl_io_state( cv::Mat & regbl_image, int regbl_state, std::string & regbl_path ) {
+    int regbl_io_state( cv::Mat & regbl_image, int regbl_state, std::string regbl_path ) {
 
         /* compose exportation path */
-        std::string regbl_export( regbl_path + "/state" + std::to_string( regbl_state ) + ".png" );
+        std::string regbl_export( regbl_path + "/state-" + std::to_string( regbl_state ) + ".png" );
 
         /* export image */
         cv::imwrite( regbl_export.c_str(), regbl_image );
@@ -162,7 +162,7 @@
                     regbl_track.at<uchar>(y,x) = 255;
 
                     /* component coordinates head */
-                    int regbl_head( 0 );
+                    unsigned int regbl_head( 0 );
 
                     /* component pixels gathering */
                     while ( regbl_head < regbl_component.size() ) {
@@ -218,7 +218,7 @@
 
                     if ( regbl_component.size() > 16 ) {
 
-                        for ( int i = 0; i < regbl_component.size(); i ++ ) {
+                        for ( unsigned int i = 0; i < regbl_component.size(); i ++ ) {
 
                             regbl_out.at<uchar>(regbl_component[i][1],regbl_component[i][0]) = 127;
 
@@ -250,33 +250,76 @@
 
     int main( int argc, char ** argv ) {
 
+        /* input image path */
+        char * regbl_input_path( lc_read_string( argc, argv, "--input", "-i" ) );
+
+        /* output image path */
+        char * regbl_output_path( lc_read_string( argc, argv, "--output", "-o" ) );
+
+        /* exportation path */
+        char * regbl_state_path( lc_read_string( argc, argv, "--state", "-s" ) );
+
         /* source image */
         cv::Mat regbl_source, regbl_binary, regbl_conway;
-
-        /* state exportation path */
-        std::string regbl_export( argv[2] );
 
         /* state variable */
         int regbl_state = 1;
 
+        /* check consistency */
+        if ( ( regbl_input_path == NULL ) || ( regbl_output_path == NULL ) ) {
+
+            /* display message */
+            std::cerr << "error : input/output files specification" << std::endl;
+
+        }
+
         /* import source image */
-        regbl_source = cv::imread( argv[1], cv::IMREAD_COLOR );
+        regbl_source = cv::imread( regbl_input_path, cv::IMREAD_COLOR );
 
-        regbl_state = regbl_io_state( regbl_source, regbl_state, regbl_export );
+        /* check state specification */
+        if ( regbl_state_path != NULL ) {
 
+            /* export state */
+            regbl_state = regbl_io_state( regbl_source, regbl_state, std::string( regbl_state_path ) );
+
+        }
+
+        /* black element extraction */
         regbl_process_extract_black( regbl_source, regbl_binary, 96 );
 
+        /* check state specification */
+        if ( regbl_state_path != NULL ) {
+
+            /* export state */
+            regbl_state = regbl_io_state( regbl_binary, regbl_state, std::string( regbl_state_path ) );
+
+        }
+
+        /* resize binary image */
         cv::resize(regbl_binary, regbl_binary, cv::Size(), 1.5, 1.5, cv::INTER_NEAREST);
 
-        regbl_state = regbl_io_state( regbl_binary, regbl_state, regbl_export );
+        /* check state specification */
+        if ( regbl_state_path != NULL ) {
 
+            /* export state */
+            regbl_state = regbl_io_state( regbl_binary, regbl_state, std::string( regbl_state_path ) );
+
+        }
+
+        /* experimental */
         int i = 1;
 
         while ( i > 0 ) {
 
             if ( ( i = regbl_process_conway_iteration( regbl_binary, regbl_conway, 4 ) ) > 0 ) {
 
-                regbl_state = regbl_io_state( regbl_conway, regbl_state, regbl_export );
+                /* check state specification */
+                if ( regbl_state_path != NULL ) {
+
+                    /* export state */
+                    regbl_state = regbl_io_state( regbl_conway, regbl_state, std::string( regbl_state_path ) );
+
+                }
 
             }
 
@@ -284,10 +327,21 @@
 
         }
 
+        /* experimental */
         regbl_process_pca_filtering( regbl_binary, regbl_conway );
 
-        regbl_state = regbl_io_state( regbl_conway, regbl_state, regbl_export );
+        /* check state specification */
+        if ( regbl_state_path != NULL ) {
 
+            /* export state */
+            regbl_state = regbl_io_state( regbl_conway, regbl_state, std::string( regbl_state_path ) );
+
+        }
+
+        /* export result image */
+        cv::imwrite( regbl_output_path, regbl_conway );
+
+        /* system message */
         return( 0 );
 
     }
