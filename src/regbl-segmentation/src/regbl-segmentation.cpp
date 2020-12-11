@@ -146,6 +146,12 @@
         /* tracking matrix */
         cv::Mat regbl_track( cv::Size( regbl_in.cols, regbl_in.rows ), CV_8UC1, cv::Scalar(0));
 
+        /* flood-track neighbour array */
+        int regbl_next[4][2] = { { +0, -1 }, { +0, +1 }, { -1, +0 }, { +1, +0 } };
+
+        /* coordinate push buffer */
+        int regbl_u( 0 ), regbl_v( 0 );
+
         /* parsing pixels */
         for ( int x = 1; x < ( regbl_in.cols - 1 ); x ++ ) {
 
@@ -167,48 +173,24 @@
                     /* component pixels gathering */
                     while ( regbl_head < regbl_component.size() ) {
 
-                        /* check connectivitregbl_component[regbl_head][1] */
-                        if ( ( regbl_in.at<uchar>(regbl_component[regbl_head][1]+1,regbl_component[regbl_head][0]) < 128 ) && ( regbl_track.at<uchar>(regbl_component[regbl_head][1]+1,regbl_component[regbl_head][0]) == 0 ) ) {
+                        /* parsing connected neighbours */
+                        for ( int regbl_i = 0; regbl_i < 4; regbl_i ++ ) {
 
-                            /* add piregbl_component[regbl_head][0]el to component */
-                            regbl_component.push_back( std::vector< double > { double( regbl_component[regbl_head][0] ), double( regbl_component[regbl_head][1] + 1 ) } );
+                            /* compute pre-pushed coordinates */
+                            regbl_u = regbl_component[regbl_head][0] + regbl_next[regbl_i][0];
+                            regbl_v = regbl_component[regbl_head][1] + regbl_next[regbl_i][1];
 
-                            /* update tracking */
-                            regbl_track.at<uchar>(regbl_component[regbl_head][1]+1,regbl_component[regbl_head][0]) = 255;
+                            /* check connectivity */
+                            if ( ( regbl_in.at<uchar>(regbl_v,regbl_u) < 128 ) && ( regbl_track.at<uchar>(regbl_v,regbl_u) == 0 ) ) {
 
-                        }
+                                /* add pixel to component */
+                                regbl_component.push_back( std::vector< double > { double( regbl_u ), double( regbl_v ) } );
 
-                        /* check connectivitregbl_component[regbl_head][1] */
-                        if ( ( regbl_in.at<uchar>(regbl_component[regbl_head][1]-1,regbl_component[regbl_head][0]) < 128 ) && ( regbl_track.at<uchar>(regbl_component[regbl_head][1]-1,regbl_component[regbl_head][0]) == 0 ) ) {
+                                /* update tracking */
+                                regbl_track.at<uchar>(regbl_v,regbl_u) = 255;
 
-                            /* add piregbl_component[regbl_head][0]el to component */
-                            regbl_component.push_back( std::vector< double > { double( regbl_component[regbl_head][0] ), double( regbl_component[regbl_head][1] - 1 ) } );
-
-                            /* update tracking */
-                            regbl_track.at<uchar>(regbl_component[regbl_head][1]-1,regbl_component[regbl_head][0]) = 255;
-
-                        }
-
-                        /* check connectivitregbl_component[regbl_head][1] */
-                        if ( ( regbl_in.at<uchar>(regbl_component[regbl_head][1],regbl_component[regbl_head][0]+1) < 128 ) && ( regbl_track.at<uchar>(regbl_component[regbl_head][1],regbl_component[regbl_head][0]+1) == 0 ) ) {
-
-                            /* add piregbl_component[regbl_head][0]el to component */
-                            regbl_component.push_back( std::vector< double > { double( regbl_component[regbl_head][0] + 1 ), double( regbl_component[regbl_head][1] ) } );
-
-                            /* update tracking */
-                            regbl_track.at<uchar>(regbl_component[regbl_head][1],regbl_component[regbl_head][0]+1) = 255;
-
-                        }
-
-                        /* check connectivitregbl_component[regbl_head][1] */
-                        if ( ( regbl_in.at<uchar>(regbl_component[regbl_head][1],regbl_component[regbl_head][0]-1) < 128 ) && ( regbl_track.at<uchar>(regbl_component[regbl_head][1],regbl_component[regbl_head][0]-1) == 0 ) ) {
-
-                            /* add piregbl_component[regbl_head][0]el to component */
-                            regbl_component.push_back( std::vector< double > { double( regbl_component[regbl_head][0] - 1 ), double( regbl_component[regbl_head][1] ) } );
-
-                            /* update tracking */
-                            regbl_track.at<uchar>(regbl_component[regbl_head][1],regbl_component[regbl_head][0]-1) = 255;
-
+                            }
+                            
                         }
 
                         /* update head */
@@ -270,6 +252,9 @@
 
             /* display message */
             std::cerr << "error : input/output files specification" << std::endl;
+
+            /* abort */
+            return( 0 );
 
         }
 
@@ -338,8 +323,11 @@
 
         }
 
+        /* resize to original */
+        cv::resize(regbl_conway, regbl_binary, cv::Size( regbl_source.cols, regbl_source.rows ), 0, 0, cv::INTER_NEAREST);
+
         /* export result image */
-        cv::imwrite( regbl_output_path, regbl_conway );
+        cv::imwrite( regbl_output_path, regbl_binary );
 
         /* system message */
         return( 0 );

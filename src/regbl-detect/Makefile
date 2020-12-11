@@ -2,7 +2,7 @@
 #   makefile - configuration
 #
 
-    MAKE_NAME:=regbl-segmentation
+    MAKE_NAME:=regbl-detect
     MAKE_LANG:=cpp
     MAKE_TYPE:=suite
 
