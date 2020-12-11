@@ -242,10 +242,13 @@
         char * regbl_state_path( lc_read_string( argc, argv, "--state", "-s" ) );
 
         /* source image */
-        cv::Mat regbl_source, regbl_binary, regbl_conway;
+        cv::Mat regbl_source, regbl_binary, regbl_swap;
 
         /* state variable */
-        int regbl_state = 1;
+        int regbl_state( 1 );
+
+        /* iteration parser */
+        int regbl_flag( 0 );
 
         /* check consistency */
         if ( ( regbl_input_path == NULL ) || ( regbl_output_path == NULL ) ) {
@@ -291,40 +294,43 @@
 
         }
 
-        /* experimental */
-        int i = 1;
+        /* initialise conway state */
+        regbl_flag = 1;
 
-        while ( i > 0 ) {
+        /* apply conway */
+        while ( regbl_flag > 0 ) {
 
-            if ( ( i = regbl_process_conway_iteration( regbl_binary, regbl_conway, 4 ) ) > 0 ) {
+            /* apply conway iteration and check results */
+            if ( ( regbl_flag = regbl_process_conway_iteration( regbl_binary, regbl_swap, 4 ) ) > 0 ) {
 
                 /* check state specification */
                 if ( regbl_state_path != NULL ) {
 
                     /* export state */
-                    regbl_state = regbl_io_state( regbl_conway, regbl_state, std::string( regbl_state_path ) );
+                    regbl_state = regbl_io_state( regbl_swap, regbl_state, std::string( regbl_state_path ) );
 
                 }
 
             }
 
-            regbl_binary = regbl_conway;
+            /* swap matrix */
+            regbl_binary = regbl_swap;
 
         }
 
         /* experimental */
-        regbl_process_pca_filtering( regbl_binary, regbl_conway );
+        regbl_process_pca_filtering( regbl_binary, regbl_swap );
 
         /* check state specification */
         if ( regbl_state_path != NULL ) {
 
             /* export state */
-            regbl_state = regbl_io_state( regbl_conway, regbl_state, std::string( regbl_state_path ) );
+            regbl_state = regbl_io_state( regbl_swap, regbl_state, std::string( regbl_state_path ) );
 
         }
 
         /* resize to original */
-        cv::resize(regbl_conway, regbl_binary, cv::Size( regbl_source.cols, regbl_source.rows ), 0, 0, cv::INTER_NEAREST);
+        cv::resize( regbl_swap, regbl_binary, cv::Size( regbl_source.cols, regbl_source.rows ), 0, 0, cv::INTER_NEAREST );
 
         /* export result image */
         cv::imwrite( regbl_output_path, regbl_binary );
