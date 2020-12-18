@@ -105,10 +105,194 @@
     }
 
 /*
+    source - database methods
+ */
+
+    int regbl_detect_database_header( char const * const regbl_line, char const * const regbl_target ) {
+
+        /* parsing flag */
+        bool regbl_parse( true );
+
+        /* segmentation index */
+        int regbl_tail( 0 );
+        int regbl_head( 0 );
+
+        /* token variable */
+        char regbl_token[REGBL_BUFFER] = { 0 };
+
+        /* detection index */
+        int regbl_index( 0 );
+
+        /* parsing characters */
+        while ( regbl_parse == true ) {
+
+            /* delimiter detection */
+            if ( ( regbl_line[regbl_head] == '\t' ) || ( regbl_line[regbl_head] == '\0' ) ) {
+
+                /* extract token */
+                memcpy( regbl_token, regbl_line + regbl_tail, regbl_head - regbl_tail );
+
+                /* adding termination char */
+                regbl_token[regbl_head - regbl_tail] = '\0';
+
+                /* target detection */
+                if ( strcmp( regbl_token, regbl_target ) == 0 ) {
+
+                    /* return index */
+                    return( regbl_index );
+
+                } else {
+
+                    /* update index */
+                    regbl_index ++;
+
+                    /* push new tail */
+                    regbl_tail = regbl_head + 1;
+
+                    /* detect end of string */
+                    if ( regbl_line[regbl_head] == '\0' ) {
+
+                        /* update parser flag */
+                        regbl_parse = false;
+
+                    }
+
+                }
+
+            }
+
+            /* update head */
+            regbl_head ++;
+
+        }
+
+        /* send not found code */
+        return( -1 );
+
+    }
+
+    void regbl_detect_database_entry( char const * const regbl_line, int const regbl_target, char * const regbl_token ) {
+
+        /* parsing flag */
+        bool regbl_parse( true );
+
+        /* segmentation index */
+        int regbl_tail( 0 );
+        int regbl_head( 0 );
+
+        /* detection index */
+        int regbl_index( 0 );
+
+        /* parsing characters */
+        while ( regbl_parse == true ) {
+
+            /* delimiter detection */
+            if ( ( regbl_line[regbl_head] == '\t' ) || ( regbl_line[regbl_head] == '\0' ) ) {
+
+                /* check index */
+                if ( ( regbl_index ++ ) == regbl_target ) {
+
+                    /* extract entity */
+                    memcpy( regbl_token, regbl_line + regbl_tail, regbl_head - regbl_tail );
+
+                    /* adding termination char */
+                    regbl_token[regbl_head - regbl_tail] = '\0';
+
+                    /* abort search */
+                    return;
+
+                }
+
+                /* push new tail */
+                regbl_tail = regbl_head + 1;
+
+                /* detect end of string */
+                if ( regbl_line[regbl_head] == '\0' ) {
+
+                    /* update parser flag */
+                    regbl_parse = false;
+
+                }
+
+            }
+
+            /* update head */
+            regbl_head ++;
+
+        }
+
+    }
+
+/*
     source - main function
  */
 
     int main( int argc, char ** argv ) {
+
+        /* database input */
+        char * regbl_database_path( lc_read_string( argc, argv, "--database", "-d" ) );
+
+        /* reading buffers */
+        char regbl_head[REGBL_BUFFER] = { 0 };
+        char regbl_line[REGBL_BUFFER] = { 0 };
+
+        /* detection index */
+        int regbl_EGID ( 0 );
+        int regbl_GKODE( 0 );
+        int regbl_GKODN( 0 );
+        int regbl_GBAUJ( 0 );
+
+        /* database stream */
+        std::ifstream regbl_stream( regbl_database_path, std::ifstream::in );
+
+        /* check stream */
+        if ( regbl_stream.is_open() == false ) {
+
+            /* display message */
+            std::cerr << "error : unable to open database" << std::endl;
+
+            /* abort */
+            return( 0 );
+
+        }
+
+        /* import database header */
+        regbl_stream.getline( regbl_head, REGBL_BUFFER );
+
+        /* detect database entries */
+        regbl_EGID  = regbl_detect_database_header( regbl_head, "EGID"  );
+        regbl_GKODE = regbl_detect_database_header( regbl_head, "GKODE" );
+        regbl_GKODN = regbl_detect_database_header( regbl_head, "GKODN" );
+        regbl_GBAUJ = regbl_detect_database_header( regbl_head, "GBAUJ" );
+
+        /* parsing database entries */
+        while ( regbl_stream.getline( regbl_line, REGBL_BUFFER ) ) {
+
+            //fprintf( stderr, "%s\n", regbl_line );
+
+            char token[REGBL_BUFFER];
+
+            regbl_detect_database_entry( regbl_line, regbl_GKODE, token );
+
+            double coordx( std::atof( token ) );
+
+            regbl_detect_database_entry( regbl_line, regbl_GKODN, token );
+
+            double coordy( std::atof( token ) );
+
+            fprintf( stderr, "%f %f\n", coordx, coordy );
+
+        }
+
+        /* delete input stream */
+        regbl_stream.close();
+
+        /* send message */
+        return( 0 );
+
+    }
+
+    int main_( int argc, char ** argv ) {
 
         /* database input */
         char * regbl_database_path( lc_read_string( argc, argv, "--database", "-d" ) );

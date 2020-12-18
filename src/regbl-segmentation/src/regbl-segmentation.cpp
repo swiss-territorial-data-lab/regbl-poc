@@ -60,7 +60,8 @@
         cv::meanStdDev( regbl_channel[0], regbl_mean, regbl_std );
 
         /* equalization */
-        regbl_channel[0] = ( ( regbl_channel[0] - regbl_mean[0] ) / regbl_std[0] ) * 128 + regbl_mean[0];
+        //regbl_channel[0] = ( ( regbl_channel[0] - regbl_mean[0] ) / regbl_std[0] ) * 128 + regbl_mean[0];
+        regbl_channel[0] = ( ( regbl_channel[0] - regbl_mean[0] ) / regbl_std[0] ) * 64 + regbl_mean[0];
 
         /* merge image channel */
         cv::merge( regbl_channel, regbl_in );
@@ -96,8 +97,14 @@
                 /* check condition */
                 if ( regbl_l2norm < ( regbl_l2dist * regbl_l2dist ) ) {
 
+                    int flag( 1 );
+
+                    for ( int i = 0; i < 2; i ++ )
+                    for ( int j = i+1; j < 3; j ++ )
+                        if(std::abs(regbl_in.at<cv::Vec3b>(y,x)[i]-regbl_in.at<cv::Vec3b>(y,x)[j]) > 16) flag = 0;
+
                     /* assign binary black */
-                    regbl_out.at<uchar>(y,x) = 0;
+                    if ( flag == 1 ) regbl_out.at<uchar>(y,x) = 0;
 
                 }
 
@@ -354,31 +361,38 @@
 
     regbl_component_t regbl_filter_pca( regbl_component_t & regbl_in, double const regbl_ratio ) {
 
+        /* filtered connected components array */
         regbl_component_t filter;
 
+        /* parsing components */
         for ( unsigned int i = 0; i < regbl_in.size() ; i ++ ) {
 
+            /* prepare PCA matrix */
             cv::Mat regbl_pca( regbl_in[i].size(), 2, CV_64F );
 
+            /* parsing components pixels */
             for ( unsigned int j = 0; j < regbl_in[i].size(); j ++ ) {
 
+                /* compose PCA matrix */
                 regbl_pca.at<double>(j,0) = regbl_in[i][j][0];
                 regbl_pca.at<double>(j,1) = regbl_in[i][j][1];
 
             }
 
+            /* compute PCA */
             cv::PCA pca_analysis( regbl_pca, cv::Mat(), cv::PCA::DATA_AS_ROW );
 
-            double ratio( pca_analysis.eigenvalues.at<double>(1) / pca_analysis.eigenvalues.at<double>(0) );
+            /* apply filtering condition */
+            if ( ( pca_analysis.eigenvalues.at<double>(1) / pca_analysis.eigenvalues.at<double>(0) ) > regbl_ratio ) {
 
-            if ( ratio > 0.01 ) {
-
+                /* push unfiltered component */
                 filter.push_back( regbl_in[i] );
 
             }
 
         }
 
+        /* returned filtered array */
         return( filter );
 
     }
@@ -447,7 +461,8 @@
 
         /* black element extraction */
         //regbl_process_extract_black( regbl_source, regbl_binary, 96 );
-        regbl_process_extract_black( regbl_source, regbl_binary, 8 );
+        //regbl_process_extract_black( regbl_source, regbl_binary, 8 );
+        regbl_process_extract_black( regbl_source, regbl_binary, 64 );
 
         /* check state specification */
         if ( regbl_state_path != NULL ) {
@@ -458,7 +473,8 @@
         }
 
         /* resize binary image */
-        cv::resize(regbl_binary, regbl_binary, cv::Size(), 1.5, 1.5, cv::INTER_NEAREST);
+        //cv::resize(regbl_binary, regbl_binary, cv::Size(), 1.5, 1.5, cv::INTER_NEAREST);
+        cv::resize(regbl_binary, regbl_binary, cv::Size(), 2.0, 2.0, cv::INTER_NEAREST);
 
         /* check state specification */
         if ( regbl_state_path != NULL ) {
@@ -495,7 +511,8 @@
         /* extract connected component */
         regbl_component = regbl_extract_connected( regbl_binary );
 
-        regbl_component = regbl_filter_pca( regbl_component, 0 );
+        /* applying PCA filtering */
+        regbl_component = regbl_filter_pca( regbl_component, 0.01 );
 
         /* render component on raster */
         regbl_process_component_raster( regbl_component, regbl_binary, cv::Size( regbl_binary.cols, regbl_binary.rows ) );

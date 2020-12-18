@@ -65,6 +65,9 @@
     header - preprocessor definitions
  */
 
+    /* define string buffer length */
+    # define REGBL_BUFFER 8192
+
 /*
     header - preprocessor macros
  */
@@ -82,6 +85,10 @@
  */
 
     void regbl_detect( cv::Mat & regbl_image, std::string regbl_database, std::string regbl_date, std::string regbl_output );
+
+    int regbl_detect_database_header( char const * const regbl_line, char const * const regbl_target );
+
+    void regbl_detect_database_entry( char const * const regbl_line, int const regbl_target, char * const regbl_token );
 
     int main( int argc, char ** argv );
 
