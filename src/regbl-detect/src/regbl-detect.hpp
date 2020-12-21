@@ -84,6 +84,8 @@
     header - function prototypes
  */
 
+    void regbl_detect( char const * const regbl_database, char const * const regbl_storage, cv::Mat & regbl_map, std::string & regbl_location, std::string & regbl_year, double const regbl_xmin, double const regbl_xmax, double const regbl_ymin, double const regbl_ymax );
+
     void regbl_detect( cv::Mat & regbl_image, std::string regbl_database, std::string regbl_date, std::string regbl_output );
 
     int regbl_detect_database_header( char const * const regbl_line, char const * const regbl_target );

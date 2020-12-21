@@ -25,6 +25,81 @@
     source - processing methods
  */
 
+    void regbl_detect( char const * const regbl_database, char const * const regbl_storage, cv::Mat & regbl_map, std::string & regbl_location, std::string & regbl_year, double const regbl_xmin, double const regbl_xmax, double const regbl_ymin, double const regbl_ymax ) {
+
+        /* reading buffers */
+        char regbl_head[REGBL_BUFFER] = { 0 };
+        char regbl_line[REGBL_BUFFER] = { 0 };
+
+        /* detection index */
+        int regbl_EGID ( 0 );
+        int regbl_GKODE( 0 );
+        int regbl_GKODN( 0 );
+        int regbl_GBAUJ( 0 );
+
+        /* reading token */
+        char regbl_token[REGBL_BUFFER] = { 0 };
+
+        /* coordinates variable */
+        double regbl_x( 0. );
+        double regbl_y( 0. );
+
+        /* database stream */
+        std::ifstream regbl_stream( regbl_database, std::ifstream::in );
+
+        /* check stream */
+        if ( regbl_stream.is_open() == false ) {
+
+            /* display message */
+            std::cerr << "error : unable to open database" << std::endl;
+
+            /* abort */
+            return;
+
+        }
+
+        /* import database header */
+        regbl_stream.getline( regbl_head, REGBL_BUFFER );
+
+        /* detect database entries */
+        regbl_EGID  = regbl_detect_database_header( regbl_head, "EGID"  );
+        regbl_GKODE = regbl_detect_database_header( regbl_head, "GKODE" );
+        regbl_GKODN = regbl_detect_database_header( regbl_head, "GKODN" );
+        regbl_GBAUJ = regbl_detect_database_header( regbl_head, "GBAUJ" );
+
+        /* parsing database entries */
+        while ( regbl_stream.getline( regbl_line, REGBL_BUFFER ) ) {
+
+            /* read coordinates token */
+            regbl_detect_database_entry( regbl_line, regbl_GKODE, regbl_token );
+
+            /* convert token */
+            regbl_x = std::atof( regbl_token );
+
+            /* read coordinates token */
+            regbl_detect_database_entry( regbl_line, regbl_GKODN, regbl_token );
+
+            /* convert token */
+            regbl_y = std::atof( regbl_token );
+
+            /* check coordinates boundaries */
+            if ( ( regbl_x >= regbl_xmin ) && ( regbl_x < regbl_xmax ) && ( regbl_y >= regbl_ymin ) && ( regbl_y < regbl_ymax ) ) {
+
+                /* convert geographical coordinates to map pixel coordinates */
+                regbl_x = ( ( regbl_x - regbl_xmin ) / ( regbl_xmax - regbl_xmin ) ) * regbl_map.rows;
+                regbl_y = ( ( regbl_y - regbl_ymin ) / ( regbl_ymax - regbl_ymin ) ) * regbl_map.cols;
+
+                regbl_map.at<uchar>( regbl_y, regbl_x ) = 127;
+
+            }
+
+        }
+
+        /* delete input stream */
+        regbl_stream.close(); 
+
+    }
+
     void regbl_detect( cv::Mat & regbl_image, std::string regbl_database, std::string regbl_date, std::string regbl_output ) {
 
         /* database connector */
@@ -228,6 +303,113 @@
  */
 
     int main( int argc, char ** argv ) {
+
+        /* storage structure path */
+        char * regbl_storage_path( lc_read_string( argc, argv, "--storage", "-s" ) );
+
+        /* database input */
+        char * regbl_database_path( lc_read_string( argc, argv, "--database", "-d" ) );
+
+        /* storage list stream */
+        std::ifstream regbl_list;
+
+        /* list token */
+        std::string regbl_location;
+        std::string regbl_year;
+        std::string regbl_xmin;
+        std::string regbl_xmax;
+        std::string regbl_ymin;
+        std::string regbl_ymax;
+
+        /* raster image */
+        cv::Mat regbl_map;
+
+        /* check path specification */
+        if ( regbl_storage_path == NULL ) {
+
+            /* display message */
+            std::cerr << "error : storage path specification" << std::endl;
+
+            /* abort */
+            return( 0 );
+
+        }
+
+        /* check path specification */
+        if ( regbl_database_path == NULL ) {
+
+            /* display message */
+            std::cerr << "error : database path specification" << std::endl;
+
+            /* abort */
+            return( 0 );
+
+        }
+
+        /* create list stream */
+        regbl_list.open( regbl_storage_path + std::string( "/regbl_list" ), std::ifstream::in );
+
+        /* check list stream */
+        if ( regbl_list.is_open() == false ) {
+
+            /* display message */
+            std::cerr << "error : unable to access storage list" << std::endl;
+
+            /* abort */
+            return( 0 );
+
+        }
+
+        /* parsing list */
+        while ( regbl_list >> regbl_location ) {
+
+            /* import subsequent tokens */
+            if ( regbl_list >> regbl_year >> regbl_xmin >> regbl_xmax >> regbl_ymin >> regbl_ymax ) {
+
+                std::cerr << regbl_location << " "
+                          << regbl_year << " " 
+                          << regbl_xmin << " " 
+                          << regbl_xmax << " " 
+                          << regbl_ymin << " " 
+                          << regbl_ymax << std::endl;
+
+                /* import image */
+                regbl_map = cv::imread( regbl_storage_path + std::string("/regbl_frame/frame_") + regbl_location + std::string("/") + regbl_location + std::string("_") + regbl_year + std::string(".tif"), cv::IMREAD_GRAYSCALE );
+
+                /* invert map y-axis */
+                cv::flip( regbl_map, regbl_map, 0 );
+
+                /* check image importation */
+                if ( regbl_map.empty() == false ) {
+
+                    /* processing database on current map */
+                    regbl_detect( regbl_database_path, regbl_storage_path, regbl_map, regbl_location, regbl_year, std::stod( regbl_xmin, NULL ), std::stod( regbl_xmax, NULL ), std::stod( regbl_ymin, NULL ), std::stod( regbl_ymax, NULL ) );
+
+                } else {
+
+                    /* display message */
+                    std::cerr << "error : unable to access map" << std::endl;
+
+                    /* abort */
+                    return( 0 );
+
+                }
+
+            }
+
+            cv::imwrite( "/home/user/Documents/output.png", regbl_map );
+
+        }
+
+        /* delete list stream */
+        regbl_list.close();
+
+        /* send message */
+        return( 0 );
+
+    }
+
+    int main__( int argc, char ** argv ) {
 
         /* database input */
         char * regbl_database_path( lc_read_string( argc, argv, "--database", "-d" ) );
