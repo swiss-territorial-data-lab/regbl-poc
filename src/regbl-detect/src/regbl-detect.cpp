@@ -44,6 +44,12 @@
         double regbl_x( 0. );
         double regbl_y( 0. );
 
+        /* detection flag */
+        int regbl_flag( 0 );
+
+        /* exportation stream */
+        std::ofstream regbl_export;
+
         /* database stream */
         std::ifstream regbl_stream( regbl_database, std::ifstream::in );
 
@@ -54,7 +60,7 @@
             std::cerr << "error : unable to open database" << std::endl;
 
             /* abort */
-            return;
+            exit( 1 );
 
         }
 
@@ -66,6 +72,50 @@
         regbl_GKODE = regbl_detect_database_header( regbl_head, "GKODE" );
         regbl_GKODN = regbl_detect_database_header( regbl_head, "GKODN" );
         regbl_GBAUJ = regbl_detect_database_header( regbl_head, "GBAUJ" );
+
+        /* check entry */
+        if ( regbl_EGID < 0 ) {
+
+            /* display message */
+            std::cerr << "error : unable to locate EGID in database" << std::endl;
+
+            /* abort */
+            exit( 1 );
+
+        }
+
+        /* check entry */
+        if ( regbl_GKODE < 0 ) {
+
+            /* display message */
+            std::cerr << "error : unable to locate GKODE in database" << std::endl;
+
+            /* abort */
+            exit( 1 );
+
+        }
+
+        /* check entry */
+        if ( regbl_GKODN < 0 ) {
+
+            /* display message */
+            std::cerr << "error : unable to locate GKODN in database" << std::endl;
+
+            /* abort */
+            exit( 1 );
+
+        }
+
+        /* check entry */
+        if ( regbl_GBAUJ < 0 ) {
+
+            /* display message */
+            std::cerr << "error : unable to locate GBAUJ in database" << std::endl;
+
+            /* abort */
+            exit( 1 );
+
+        }
 
         /* parsing database entries */
         while ( regbl_stream.getline( regbl_line, REGBL_BUFFER ) ) {
@@ -89,7 +139,70 @@
                 regbl_x = ( ( regbl_x - regbl_xmin ) / ( regbl_xmax - regbl_xmin ) ) * regbl_map.rows;
                 regbl_y = ( ( regbl_y - regbl_ymin ) / ( regbl_ymax - regbl_ymin ) ) * regbl_map.cols;
 
-                regbl_map.at<uchar>( regbl_y, regbl_x ) = 127;
+                /* detect on map */
+                if ( regbl_map.at<uchar>( regbl_y, regbl_x ) > 127 ) {
+
+                    /* update flag */
+                    regbl_flag = 1;
+
+                    /* mark on map */
+                    regbl_map.at<uchar>( regbl_y, regbl_x ) = 192;
+
+                } else {
+
+                    /* update flag */
+                    regbl_flag = 0;
+
+                    /* mark on map */
+                    regbl_map.at<uchar>( regbl_y, regbl_x ) = 64;
+
+                }
+
+                /* read coordinates token */
+                regbl_detect_database_entry( regbl_line, regbl_EGID, regbl_token );
+
+                /* create exportation stream */
+                regbl_export.open( std::string( regbl_storage ) + "/regbl_output/output_database/database_" + regbl_location + "/" + regbl_location + "_" + std::string( regbl_token ), std::ofstream::out | std::ofstream::app );
+
+                /* check stream */
+                if ( regbl_export.is_open() == false ) {
+
+                    /* display message */
+                    std::cerr << "error : unable to access database output stream" << std::endl;
+
+                    /* abort */
+                    exit( 1 );
+
+                }
+
+                /* export dates */
+                regbl_export << regbl_year << " " << regbl_flag << std::endl;
+
+                /* delete stream */
+                regbl_export.close();
+
+                /* create exportation stream */
+                regbl_export.open( std::string( regbl_storage ) + "/regbl_output/output_reference/reference_" + regbl_location + "/" + regbl_location + "_" + std::string( regbl_token ), std::ofstream::out );
+
+                /* check stream */
+                if ( regbl_export.is_open() == false ) {
+
+                    /* display message */
+                    std::cerr << "error : unable to access database output stream" << std::endl;
+
+                    /* abort */
+                    exit( 1 );
+
+                }
+
+                /* read coordinates token */
+                regbl_detect_database_entry( regbl_line, regbl_GBAUJ, regbl_token );
+                
+                /* export dates */
+                regbl_export << regbl_year << " " << regbl_token << std::endl;
+
+                /* delete stream */
+                regbl_export.close();
 
             }
 
@@ -252,7 +365,7 @@
             std::cerr << "error : storage path specification" << std::endl;
 
             /* abort */
-            return( 0 );
+            return( 1 );
 
         }
 
@@ -263,7 +376,7 @@
             std::cerr << "error : database path specification" << std::endl;
 
             /* abort */
-            return( 0 );
+            return( 1 );
 
         }
 
@@ -277,9 +390,12 @@
             std::cerr << "error : unable to access storage list" << std::endl;
 
             /* abort */
-            return( 0 );
+            return( 1 );
 
         }
+
+        /* create directory */
+        std::filesystem::create_directories( std::string( regbl_storage_path ) + "/regbl_output/output_frame" );
 
         /* parsing list */
         while ( regbl_list >> regbl_location ) {
@@ -303,8 +419,23 @@
                 /* check image importation */
                 if ( regbl_map.empty() == false ) {
 
+                    /* create directory */
+                    std::filesystem::create_directories( std::string( regbl_storage_path ) + "/regbl_output/output_frame/frame_" + regbl_location );
+
+                    /* create directory */
+                    std::filesystem::create_directories( std::string( regbl_storage_path ) + "/regbl_output/output_database/database_" + regbl_location );
+
+                    /* create directory */
+                    std::filesystem::create_directories( std::string( regbl_storage_path ) + "/regbl_output/output_reference/reference_" + regbl_location );
+
                     /* processing database on current map */
                     regbl_detect( regbl_database_path, regbl_storage_path, regbl_map, regbl_location, regbl_year, std::stod( regbl_xmin, NULL ), std::stod( regbl_xmax, NULL ), std::stod( regbl_ymin, NULL ), std::stod( regbl_ymax, NULL ) );
+
+                    /* restore map y-axis */
+                    cv::flip( regbl_map, regbl_map, 0 );
+
+                    /* export map with detection marks */
+                    cv::imwrite( std::string( regbl_storage_path ) + "/regbl_output/output_frame/frame_" + regbl_location + "/" + regbl_location + "_" + regbl_year + ".tif", regbl_map );
 
                 } else {
 
@@ -312,13 +443,11 @@
                     std::cerr << "error : unable to access map" << std::endl;
 
                     /* abort */
-                    return( 0 );
+                    return( 1 );
 
                 }
 
             }
-
-            cv::imwrite( "/home/user/Documents/output.png", regbl_map );
 
         }
 
