@@ -22,7 +22,7 @@
     # include "regbl-detect.hpp"
 
 /*
-    source - processing methods
+    source - Processing methods
  */
 
     void regbl_detect( char const * const regbl_database, cv::Mat & regbl_map, std::string & regbl_export, std::string & regbl_year, double const regbl_xmin, double const regbl_xmax, double const regbl_ymin, double const regbl_ymax ) {
@@ -315,7 +315,7 @@
     }
 
 /*
-    source - database methods
+    source - Database methods
  */
 
     int regbl_detect_database_header( char const * const regbl_line, char const * const regbl_target ) {
@@ -434,7 +434,7 @@
     }
 
 /*
-    source - main function
+    source - Main function
  */
 
     int main( int argc, char ** argv ) {
