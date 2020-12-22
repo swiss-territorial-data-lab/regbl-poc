@@ -1,20 +1,20 @@
-# Overview
+## Overview
 
 _Currently under development_
 
 The _regbl-poc_ is a proof-of-concept for the detection of the construction dates
  of the swiss buildings contained in the [_OFS_](https://www.bfs.admin.ch/bfs/fr/home.html) official [RegBL](https://www.housing-stat.ch/fr/accueil.html) database.
 
-# regbl-poc
+## regbl-poc
 
-# Copyright and License
+## Copyright and License
 
 **regbl-poc** - Nils Hamel, Huriel Reichel <br >
 Copyright (c) 2020 Republic and Canton of Geneva
 
 This program is licensed under the terms of the GNU GPLv3. Documentation and illustrations are licensed under the terms of the CC BY-NC-SA.
 
-# Dependencies
+## Dependencies
 
 The _regbl-poc_ comes with the following package (Ubuntu 20.04 LTS) dependencies ([Instructions](DEPEND.md)) :
 
