@@ -337,7 +337,7 @@
         while ( regbl_parse == true ) {
 
             /* delimiter detection */
-            if ( ( regbl_line[regbl_head] == '\t' ) || ( regbl_line[regbl_head] == '\0' ) ) {
+            if ( ( regbl_line[regbl_head] == REGBL_DELIMITER ) || ( regbl_line[regbl_head] == '\0' ) ) {
 
                 /* extract token */
                 memcpy( regbl_token, regbl_line + regbl_tail, regbl_head - regbl_tail );
@@ -397,7 +397,7 @@
         while ( regbl_parse == true ) {
 
             /* delimiter detection */
-            if ( ( regbl_line[regbl_head] == '\t' ) || ( regbl_line[regbl_head] == '\0' ) ) {
+            if ( ( regbl_line[regbl_head] == REGBL_DELIMITER ) || ( regbl_line[regbl_head] == '\0' ) ) {
 
                 /* check index */
                 if ( ( regbl_index ++ ) == regbl_target ) {

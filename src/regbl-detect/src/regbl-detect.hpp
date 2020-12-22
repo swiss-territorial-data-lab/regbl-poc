@@ -68,6 +68,9 @@
     /* define string buffer length */
     # define REGBL_BUFFER 8192
 
+    /* define delimiter */
+    # define REGBL_DELIMITER '\t'
+
 /*
     header - preprocessor macros
  */
@@ -84,7 +87,102 @@
     header - function prototypes
  */
 
+    /*! \brief Processing methods
+     *
+     *  This function performs the actual building detection on the current
+     *  provided map. It uses the map, expected to be pre-processed, colors and
+     *  the building coordinates to decided whether or not the building is
+     *  there.
+     *
+     *  The function starts by reading the header of the DSV database before to
+     *  search for the entries :
+     *
+     *      EGID, GKODE, GKODN, GBAUJ
+     *
+     *  which corresponds to the ID of the buildings, their coordinates and the
+     *  construction date, when available.
+     *
+     *  As the entries are found in the header, the function starts parsing the
+     *  provided RegBL DSV database segment file. It is parsed line by line,
+     *  each one describing one building.
+     *
+     *  For each building, the function checks if its coordinates are on the map
+     *  or not using the provided boundaries. In case the building is on the
+     *  map, it's coordinates are converted from CH1903+/LV95 to the pixel
+     *  coordinates of the map.
+     *
+     *  Using the pixel coordinates of the building and the map itself, the
+     *  function determine if the building is on the map or not. To do so, the
+     *  color of the underlying pixel at the position of the building is at its
+     *  maximum value (255). In such a case, the detection succeed.
+     *
+     *  For each building, the function uses the provided exportation path to
+     *  create or append to a file the result of the detection. It add a line to
+     *  the file containing the year of the considered map a a zero or a one
+     *  indicating that the building was not found or found, respectively.
+     *
+     *  The result are append in files in order to have the history of the
+     *  detection for each building in a single file. The name of the file is
+     *  set using the considered building unique ID (EGID).
+     *
+     *  In addition, the function also update the map itself to indicate the
+     *  position of each detection and its results. In case the detection
+     *  failed, a 64-valued pixel is set, a 192-valued pixel otherwise. This
+     *  allows to export the map afterwards to have a graphical view of the
+     *  detection.
+     *
+     *  The provided map is expected to be a OpenCV greyscale matrix containing
+     *  only black (0) and white (255) pixel in uint8 (uchar) format. The white
+     *  pixels are used to map building while black ones are used for the rest.
+     *
+     *  \param regbl_database Path of the RegBL DSV database segment file
+     *  \param regbl_map      OpenCV matrix containing the map
+     *  \param regbl_export   Directory in which files are exported
+     *  \param regbl_year     String containing the year of the map
+     *  \param regbl_xmin     Location boundaries coordinate : low E - EPSG:2056
+     *  \param regbl_xmax     Location boundaries coordinate : high E - EPSG:2056
+     *  \param regbl_ymin     Location boundaries coordinate : low N - EPSG:2056
+     *  \param regbl_ymax     Location boundaries coordinate : high N - EPSG:2056
+     */
+
     void regbl_detect( char const * const regbl_database, cv::Mat & regbl_map, std::string & regbl_export, std::string & regbl_year, double const regbl_xmin, double const regbl_xmax, double const regbl_ymin, double const regbl_ymax );
+
+    /*! \brief Processing methods
+     *
+     *  This function is used to extract the reference information about the
+     *  construction date of the building in the considered RegBL database
+     *  segment.
+     *
+     *  The function starts by reading the header of the DSV database before to
+     *  search for the entries :
+     *
+     *      EGID, GKODE, GKODN, GBAUJ
+     *
+     *  which corresponds to the ID of the buildings, their coordinates and the
+     *  construction date, when available.
+     *
+     *  As the entries are found in the header, the DSV database is parsed line
+     *  by line, each line corresponding to one building.
+     *
+     *  For each line, the function extracts the four entries and only consider
+     *  the building that are within the current map (location). This filtering
+     *  is made using the provided boundaries in CH1903+/LV95.
+     *
+     *  As the building is on the current processed map, its construction date
+     *  is extracted and analysed. If a date is available, it is exported in
+     *  the building file. If not, minus one is exported instead.
+     *
+     *  A exportation file is created for each building using its ID (EGID) to
+     *  name it. It follows that this function creates a large amount of small
+     *  files.
+     *
+     *  \param regbl_database Path of the RegBL DSV database segment file
+     *  \param regbl_export   Directory in which files are exported
+     *  \param regbl_xmin     Location boundaries coordinate : low E - EPSG:2056
+     *  \param regbl_xmax     Location boundaries coordinate : high E - EPSG:2056
+     *  \param regbl_ymin     Location boundaries coordinate : low N - EPSG:2056
+     *  \param regbl_ymax     Location boundaries coordinate : high N - EPSG:2056
+     */
 
     void regbl_detect_reference( char const * const regbl_database, std::string & regbl_export, double const regbl_xmin, double const regbl_xmax, double const regbl_ymin, double const regbl_ymax );
 
