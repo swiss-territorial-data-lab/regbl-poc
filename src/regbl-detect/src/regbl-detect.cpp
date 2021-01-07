@@ -148,13 +148,13 @@
                 }
 
                 /* detect on map */
-                if ( regbl_map.at<uchar>( regbl_y, regbl_x ) > 127 ) {
+                if ( regbl_map.at<uchar>( regbl_y, regbl_x ) < 127 ) {
 
                     /* export detection result */
                     regbl_output << regbl_year << " 1" << std::endl;
 
                     /* mark on map */
-                    regbl_map.at<uchar>( regbl_y, regbl_x ) = 192;
+                    regbl_map.at<uchar>( regbl_y, regbl_x ) = 64;
 
                 } else {
 
@@ -162,7 +162,7 @@
                     regbl_output << regbl_year << " 0" << std::endl;
 
                     /* mark on map */
-                    regbl_map.at<uchar>( regbl_y, regbl_x ) = 64;
+                    regbl_map.at<uchar>( regbl_y, regbl_x ) = 192;
 
                 }
 

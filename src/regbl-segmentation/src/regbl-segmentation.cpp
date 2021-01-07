@@ -412,6 +412,18 @@
         /* exportation path */
         char * regbl_state_path( lc_read_string( argc, argv, "--state", "-s" ) );
 
+        /* inversion state */
+        bool regbl_invert( lc_read_flag( argc, argv, "--invert", "-v" ) );
+
+        /* equalize state */
+        bool regbl_equalize( lc_read_flag( argc, argv, "--equalize", "-e" ) );
+
+        /* resize factor */
+        double regbl_resize( lc_read_double( argc, argv, "--factor", "-f", 1.0 ) );
+
+        /* iteration limit */
+        int regbl_limit( lc_read_signed( argc, argv, "--limit", "-l", 32 ) );
+
         /* source image */
         cv::Mat regbl_source, regbl_binary, regbl_swap;
 
@@ -446,15 +458,35 @@
 
         }
 
+        /* check inversion */
+        if ( regbl_invert == true ) {
 
+            /* invert image */
+            regbl_source = cv::Scalar(255) - regbl_source;
 
-        regbl_tool_equalize( regbl_source );
+            /* check state specification */
+            if ( regbl_state_path != NULL ) {
 
-        /* check state specification */
-        if ( regbl_state_path != NULL ) {
+                /* export state */
+                regbl_state = regbl_io_state( regbl_source, regbl_state, std::string( regbl_state_path ) );
 
-            /* export state */
-            regbl_state = regbl_io_state( regbl_source, regbl_state, std::string( regbl_state_path ) );
+            }
+
+        }
+
+        /* check equalisation */
+        if ( regbl_equalize == true ) {
+
+            /* equalize image */
+            regbl_tool_equalize( regbl_source );
+
+            /* check state specification */
+            if ( regbl_state_path != NULL ) {
+
+                /* export state */
+                regbl_state = regbl_io_state( regbl_source, regbl_state, std::string( regbl_state_path ) );
+
+            }
 
         }
 
@@ -474,7 +506,7 @@
 
         /* resize binary image */
         //cv::resize(regbl_binary, regbl_binary, cv::Size(), 1.5, 1.5, cv::INTER_NEAREST);
-        cv::resize(regbl_binary, regbl_binary, cv::Size(), 2.0, 2.0, cv::INTER_NEAREST);
+        cv::resize(regbl_binary, regbl_binary, cv::Size(), regbl_resize, regbl_resize, cv::INTER_NEAREST);
 
         /* check state specification */
         if ( regbl_state_path != NULL ) {
@@ -485,10 +517,10 @@
         }
 
         /* initialise conway state */
-        regbl_flag = 1;
+        regbl_flag = regbl_limit + 1;
 
         /* apply conway */
-        while ( regbl_flag > 0 ) {
+        while ( regbl_flag > regbl_limit ) {
 
             /* apply conway iteration and check results */
             if ( ( regbl_flag = regbl_process_conway_iteration( regbl_binary, regbl_swap, 4 ) ) > 0 ) {
@@ -500,6 +532,8 @@
                     regbl_state = regbl_io_state( regbl_swap, regbl_state, std::string( regbl_state_path ) );
 
                 }
+
+                std::cerr << regbl_flag << std::endl;
 
             }
 
