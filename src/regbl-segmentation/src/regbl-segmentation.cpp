@@ -60,8 +60,8 @@
         cv::meanStdDev( regbl_channel[0], regbl_mean, regbl_std );
 
         /* equalization */
-        //regbl_channel[0] = ( ( regbl_channel[0] - regbl_mean[0] ) / regbl_std[0] ) * 128 + regbl_mean[0];
-        regbl_channel[0] = ( ( regbl_channel[0] - regbl_mean[0] ) / regbl_std[0] ) * 64 + regbl_mean[0];
+        regbl_channel[0] = ( ( regbl_channel[0] - regbl_mean[0] ) / regbl_std[0] ) * 128 + regbl_mean[0];
+        //regbl_channel[0] = ( ( regbl_channel[0] - regbl_mean[0] ) / regbl_std[0] ) * 64 + regbl_mean[0];
 
         /* merge image channel */
         cv::merge( regbl_channel, regbl_in );
@@ -489,7 +489,6 @@
             }
 
         }
-
 
         /* black element extraction */
         //regbl_process_extract_black( regbl_source, regbl_binary, 96 );

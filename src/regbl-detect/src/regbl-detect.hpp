@@ -87,7 +87,7 @@
     header - function prototypes
  */
 
-    /*! \brief Processing methods
+    /*! \brief Processing methods (un-synchronised)
      *
      *  This function performs the actual building detection on the current
      *  provided map. It uses the map, expected to be pre-processed, colors and
@@ -145,7 +145,7 @@
      *  \param regbl_ymax     Location boundaries coordinate : high N - EPSG:2056
      */
 
-    void regbl_detect( char const * const regbl_database, cv::Mat & regbl_map, std::string & regbl_export, std::string & regbl_year, double const regbl_xmin, double const regbl_xmax, double const regbl_ymin, double const regbl_ymax );
+    void regbl_detect( char const * const regbl_database, cv::Mat & regbl_map, cv::Mat & regbl_track, std::string & regbl_export, std::string & regbl_year, double const regbl_xmin, double const regbl_xmax, double const regbl_ymin, double const regbl_ymax );
 
     /*! \brief Processing methods
      *

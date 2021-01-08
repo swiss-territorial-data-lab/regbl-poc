@@ -36,6 +36,7 @@
         /* file tokens */
         std::string regbl_date;
         std::string regbl_state;
+        std::string regbl_void;
 
         /* memory token */
         std::string regbl_memory( "2020" );
@@ -44,6 +45,7 @@
         bool regbl_flag( true );
 
         /* detection state */
+        bool regbl_initial( false );
         bool regbl_detected( false );
 
         /* check consistency */
@@ -61,36 +63,46 @@
         while ( regbl_flag ) {
 
             /* import token */
-            if ( regbl_input >> regbl_date >> regbl_state ) {
+            if ( regbl_input >> regbl_date >> regbl_state >> regbl_void >> regbl_void ) {
 
                 /* check flag state */
                 if ( regbl_state == "0" ) {
 
-                    /* create output stream */
-                    regbl_output.open( regbl_export + "/" + std::string( std::filesystem::path( regbl_path ).filename() ), std::ios::out );
+                    /* check initial state */
+                    if ( regbl_initial == true ) {
 
-                    /* check consistency */
-                    if ( regbl_output.is_open() == false ) {
+                        /* create output stream */
+                        regbl_output.open( regbl_export + "/" + std::string( std::filesystem::path( regbl_path ).filename() ), std::ios::out );
 
-                        /* display message */
-                        std::cerr << "error : unable to access database building exportation file" << std::endl;
+                        /* check consistency */
+                        if ( regbl_output.is_open() == false ) {
 
-                        /* send message */
-                        exit( 1 );
+                            /* display message */
+                            std::cerr << "error : unable to access database building exportation file" << std::endl;
+
+                            /* send message */
+                            exit( 1 );
+
+                        }
+
+                        /* export detected building date range boundary */
+                        regbl_output << regbl_memory << " " << regbl_date;
+
+                        /* delete output stream */
+                        regbl_output.close();
+
+                        /* update loop state */
+                        regbl_flag = false;
+
+                        /* update detection state */
+                        regbl_detected = true;
 
                     }
 
-                    /* export detected building date range boundary */
-                    regbl_output << regbl_memory << " " << regbl_date;
+                } else {
 
-                    /* delete output stream */
-                    regbl_output.close();
-
-                    /* update loop state */
-                    regbl_flag = false;
-
-                    /* update detection state */
-                    regbl_detected = true;
+                    /* update initial state */
+                    regbl_initial = true;
 
                 }
 

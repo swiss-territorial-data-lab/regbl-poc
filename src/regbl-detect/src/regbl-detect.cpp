@@ -25,7 +25,7 @@
     source - Processing methods
  */
 
-    void regbl_detect( char const * const regbl_database, cv::Mat & regbl_map, std::string & regbl_export, std::string & regbl_year, double const regbl_xmin, double const regbl_xmax, double const regbl_ymin, double const regbl_ymax ) {
+    void regbl_detect( char const * const regbl_database, cv::Mat & regbl_map, cv::Mat & regbl_track, std::string & regbl_export, std::string & regbl_year, double const regbl_xmin, double const regbl_xmax, double const regbl_ymin, double const regbl_ymax ) {
 
         /* reading buffers */
         char regbl_head[REGBL_BUFFER] = { 0 };
@@ -151,18 +151,20 @@
                 if ( regbl_map.at<uchar>( regbl_y, regbl_x ) < 127 ) {
 
                     /* export detection result */
-                    regbl_output << regbl_year << " 1" << std::endl;
+                    regbl_output << regbl_year << " 1 " << regbl_x << " " << regbl_y << std::endl;
 
-                    /* mark on map */
-                    regbl_map.at<uchar>( regbl_y, regbl_x ) = 64;
+                    /* update traking map */
+                    cv::line( regbl_track, cv::Point( regbl_x    , regbl_y - 3 ), cv::Point( regbl_x    , regbl_y + 3 ), cv::Scalar( 0, 255, 0, 255 ) );
+                    cv::line( regbl_track, cv::Point( regbl_x - 3, regbl_y     ), cv::Point( regbl_x + 3, regbl_y     ), cv::Scalar( 0, 255, 0, 255 ) );
 
                 } else {
 
                     /* export detection result */
-                    regbl_output << regbl_year << " 0" << std::endl;
+                    regbl_output << regbl_year << " 0 " << regbl_x << " " << regbl_y <<  std::endl;
 
-                    /* mark on map */
-                    regbl_map.at<uchar>( regbl_y, regbl_x ) = 192;
+                    /* update traking map */
+                    cv::line( regbl_track, cv::Point( regbl_x    , regbl_y - 3 ), cv::Point( regbl_x    , regbl_y + 3 ), cv::Scalar( 0, 0, 255, 255 ) );
+                    cv::line( regbl_track, cv::Point( regbl_x - 3, regbl_y     ), cv::Point( regbl_x + 3, regbl_y     ), cv::Scalar( 0, 0, 255, 255 ) );
 
                 }
 
@@ -458,6 +460,7 @@
 
         /* raster image */
         cv::Mat regbl_map;
+        cv::Mat regbl_track;
 
         /* path variable */
         std::string regbl_export;
@@ -522,6 +525,10 @@
                     /* invert map y-axis */
                     cv::flip( regbl_map, regbl_map, 0 );
 
+                    /* create detection tracking map */
+                    //cv::cvtColor( regbl_map, regbl_track, cv::COLOR_GRAY2RGB );
+                    regbl_track = cv::Mat::zeros( cv::Size( regbl_map.cols, regbl_map.rows ), CV_8UC4 );
+
                     /* create path */
                     regbl_reference = regbl_export + "/output_reference/reference_" + regbl_location;
 
@@ -548,7 +555,7 @@
                     }
 
                     /* process detection */
-                    regbl_detect( regbl_database_path, regbl_map, regbl_database, regbl_year, std::stod( regbl_xmin, NULL ), std::stod( regbl_xmax, NULL ), std::stod( regbl_ymin, NULL ), std::stod( regbl_ymax, NULL ) );
+                    regbl_detect( regbl_database_path, regbl_map, regbl_track, regbl_database, regbl_year, std::stod( regbl_xmin, NULL ), std::stod( regbl_xmax, NULL ), std::stod( regbl_ymin, NULL ), std::stod( regbl_ymax, NULL ) );
 
                     /* create path */
                     regbl_frame = regbl_export + "/output_frame/frame_" + regbl_location;
@@ -562,10 +569,10 @@
                     }
 
                     /* restore map y-axis */
-                    cv::flip( regbl_map, regbl_map, 0 );
+                    cv::flip( regbl_track, regbl_track, 0 );
 
                     /* export map with detections */
-                    cv::imwrite( regbl_frame + "/" + regbl_location + "_" + regbl_year + ".tif", regbl_map );
+                    cv::imwrite( regbl_frame + "/" + regbl_location + "_" + regbl_year + ".tif", regbl_track );
 
                 } else {
 
