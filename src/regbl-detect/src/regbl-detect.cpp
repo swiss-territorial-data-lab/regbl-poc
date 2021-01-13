@@ -526,7 +526,6 @@
                     cv::flip( regbl_map, regbl_map, 0 );
 
                     /* create detection tracking map */
-                    //cv::cvtColor( regbl_map, regbl_track, cv::COLOR_GRAY2RGB );
                     regbl_track = cv::Mat::zeros( cv::Size( regbl_map.cols, regbl_map.rows ), CV_8UC4 );
 
                     /* create path */

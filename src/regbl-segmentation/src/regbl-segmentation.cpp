@@ -61,7 +61,6 @@
 
         /* equalization */
         regbl_channel[0] = ( ( regbl_channel[0] - regbl_mean[0] ) / regbl_std[0] ) * 128 + regbl_mean[0];
-        //regbl_channel[0] = ( ( regbl_channel[0] - regbl_mean[0] ) / regbl_std[0] ) * 64 + regbl_mean[0];
 
         /* merge image channel */
         cv::merge( regbl_channel, regbl_in );
@@ -77,6 +76,9 @@
 
     void regbl_process_extract_black( cv::Mat & regbl_in, cv::Mat & regbl_out, int const regbl_l2dist ) {
 
+        /* gray proximity flag */
+        bool regbl_gflag( false );
+
         /* initialise output matrix */
         regbl_out = cv::Mat( cv::Size( regbl_in.cols, regbl_in.rows ), CV_8UC1, cv::Scalar(255));
 
@@ -84,27 +86,46 @@
         double regbl_l2norm( 0 );
 
         /* parsing pixels */
-        for ( int x = 0; x < regbl_in.cols; x ++ ) {
+        for ( int regbl_x = 0; regbl_x < regbl_in.cols; regbl_x ++ ) {
 
             /* parsing pixels */
-            for ( int y = 0; y < regbl_in.rows; y ++ ) {
+            for ( int regbl_y = 0; regbl_y < regbl_in.rows; regbl_y ++ ) {
 
                 /* compute L2-norm */
-                regbl_l2norm = regbl_in.at<cv::Vec3b>(y,x)[0] * regbl_in.at<cv::Vec3b>(y,x)[0] +
-                               regbl_in.at<cv::Vec3b>(y,x)[1] * regbl_in.at<cv::Vec3b>(y,x)[1] +
-                               regbl_in.at<cv::Vec3b>(y,x)[2] * regbl_in.at<cv::Vec3b>(y,x)[2];
+                regbl_l2norm = regbl_in.at<cv::Vec3b>(regbl_y,regbl_x)[0] * regbl_in.at<cv::Vec3b>(regbl_y,regbl_x)[0] +
+                               regbl_in.at<cv::Vec3b>(regbl_y,regbl_x)[1] * regbl_in.at<cv::Vec3b>(regbl_y,regbl_x)[1] +
+                               regbl_in.at<cv::Vec3b>(regbl_y,regbl_x)[2] * regbl_in.at<cv::Vec3b>(regbl_y,regbl_x)[2];
 
                 /* check condition */
                 if ( regbl_l2norm < ( regbl_l2dist * regbl_l2dist ) ) {
 
-                    int flag( 1 );
+                    /* reset proximity flag */
+                    regbl_gflag = true;
 
-                    for ( int i = 0; i < 2; i ++ )
-                    for ( int j = i+1; j < 3; j ++ )
-                        if(std::abs(regbl_in.at<cv::Vec3b>(y,x)[i]-regbl_in.at<cv::Vec3b>(y,x)[j]) > 16) flag = 0;
+                    /* parsing components */
+                    for ( int regbl_i = 0; regbl_i < 2; regbl_i ++ ) {
 
-                    /* assign binary black */
-                    if ( flag == 1 ) regbl_out.at<uchar>(y,x) = 0;
+                        /* parsing components */
+                        for ( int regbl_j = regbl_i + 1; regbl_j < 3; regbl_j ++ ) {
+
+                            /* component proximity check */
+                            if(std::abs(regbl_in.at<cv::Vec3b>(regbl_y,regbl_x)[regbl_i]-regbl_in.at<cv::Vec3b>(regbl_y,regbl_x)[regbl_j]) > 16) {
+
+                                /* update proximity flag */
+                                regbl_gflag = false;
+                            }
+
+                        }
+
+                    }
+
+                    /* check proximity detection results */
+                    if ( regbl_gflag == true ) {
+
+                        /* assign black pixel */
+                        regbl_out.at<uchar>(regbl_y,regbl_x) = 0;
+
+                    }
 
                 }
 
