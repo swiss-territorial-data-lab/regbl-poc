@@ -542,13 +542,13 @@
         }
 
         /* extract connected component */
-        regbl_component = regbl_extract_connected( regbl_binary );
+        //regbl_component = regbl_extract_connected( regbl_binary );
 
         /* applying PCA filtering */
-        regbl_component = regbl_filter_pca( regbl_component, 0.01 );
+        //regbl_component = regbl_filter_pca( regbl_component, 0.01 );
 
         /* render component on raster */
-        regbl_process_component_raster( regbl_component, regbl_binary, cv::Size( regbl_binary.cols, regbl_binary.rows ) );
+        //regbl_process_component_raster( regbl_component, regbl_binary, cv::Size( regbl_binary.cols, regbl_binary.rows ) );
 
         /* check state specification */
         if ( regbl_state_path != NULL ) {
