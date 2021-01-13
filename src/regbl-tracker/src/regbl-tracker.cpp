@@ -216,8 +216,6 @@
             regbl_cnx = REGBL_TRACKER_CROPHALF;
             regbl_cny = REGBL_TRACKER_CROPHALF;
 
-            std::cerr << regbl_cnx << " " << regbl_cny << " " << regbl_clx << " " << regbl_chx << " "<< regbl_cly << " "<< regbl_chy << std::endl;
-
             /* edge detection */
             if ( regbl_clx < 0 ) {
 
