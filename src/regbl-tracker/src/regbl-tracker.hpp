@@ -85,7 +85,11 @@
     header - function prototypes
  */
 
+    /*! ... */
+
     void regbl_tracker_crop( cv::Mat & regbl_crop, int const regbl_cnx, int const regbl_cny, std::string & regbl_date, int const regbl_detect );
+
+    /*! ... */
 
     cv::Mat regbl_tracker_reference( int const regbl_width, std::string regbl_geid, std::string & regbl_truth );
 

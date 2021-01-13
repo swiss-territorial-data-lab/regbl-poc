@@ -30,6 +30,9 @@
         /* color value */
         cv::Scalar regbl_color;
 
+        /* text shift value */
+        int regbl_shift( ( regbl_crop.cols - ( REGBL_TRACKER_CROPHALF * 2 ) ) / 2 );
+
         /* check detection result */
         if ( regbl_detect == 0 ) {
 
@@ -50,7 +53,7 @@
         cv::rectangle( regbl_crop, cv::Rect( 0, 0, regbl_crop.cols, 18 ), regbl_color, cv::FILLED );
 
         /* display crop date */
-        cv::putText( regbl_crop, regbl_date, cv::Point( 40, 14 ), cv::FONT_HERSHEY_PLAIN, 1, cv::Scalar( 255, 255, 255 ) );
+        cv::putText( regbl_crop, regbl_date, cv::Point( 40 + regbl_shift, 14 ), cv::FONT_HERSHEY_PLAIN, 1, cv::Scalar( 255, 255, 255 ) );
 
         /* display central cross */
         cv::line( regbl_crop, cv::Point( regbl_cnx, regbl_cny + 2 ), cv::Point(regbl_cnx, regbl_cny + REGBL_TRACKER_CROSHALF ), regbl_color );
@@ -208,6 +211,12 @@
             regbl_chx = std::round( regbl_posx ) + REGBL_TRACKER_CROPHALF;
             regbl_cly = std::round( regbl_posy ) - REGBL_TRACKER_CROPHALF;
             regbl_chy = std::round( regbl_posy ) + REGBL_TRACKER_CROPHALF;
+
+            /* assume center position */
+            regbl_cnx = REGBL_TRACKER_CROPHALF;
+            regbl_cny = REGBL_TRACKER_CROPHALF;
+
+            std::cerr << regbl_cnx << " " << regbl_cny << " " << regbl_clx << " " << regbl_chx << " "<< regbl_cly << " "<< regbl_chy << std::endl;
 
             /* edge detection */
             if ( regbl_clx < 0 ) {
