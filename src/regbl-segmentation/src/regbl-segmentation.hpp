@@ -87,13 +87,7 @@
 
     void regbl_process_extract_black( cv::Mat & regbl_in, cv::Mat & regbl_out, int const regbl_l2dist );
 
-    int regbl_process_conway_iteration( cv::Mat & regbl_in, cv::Mat & regbl_out, int const regbl_gamevalue );
-
-    regbl_component_t regbl_extract_connected( cv::Mat & regbl_in );
-
-    void regbl_process_pca_filtering( cv::Mat & regbl_in, cv::Mat & regbl_out );
-
-    regbl_component_t regbl_filter_pca( regbl_component_t & regbl_in, double const regbl_ratio );
+    void regbl_process_conway_iteration( cv::Mat & regbl_in, cv::Mat & regbl_out, int const regbl_kernel, float const regbl_gamevalue );
 
     int main( int argc, char ** argv );
 

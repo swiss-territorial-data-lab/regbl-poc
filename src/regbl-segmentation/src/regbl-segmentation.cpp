@@ -135,31 +135,50 @@
 
     }
 
-    int regbl_process_conway_iteration( cv::Mat & regbl_in, cv::Mat & regbl_out, int const regbl_gamevalue ) {
+    void regbl_process_conway_iteration( cv::Mat & regbl_in, cv::Mat & regbl_out, int const regbl_kernel, float const regbl_gamevalue ) {
 
         /* initialise output matrix */
         regbl_out = cv::Mat( cv::Size( regbl_in.cols, regbl_in.rows ), CV_8UC1, cv::Scalar(255));        
 
-        /* conway game rule counter */
-        int regbl_count( 0 );
+        /* kernel boundaries */
+        int regbl_lx( 0 );
+        int regbl_ly( 0 );
+        int regbl_hx( 0 );
+        int regbl_hy( 0 );
 
-        /* updated cell count */
-        int regbl_updated( 0 );
+        /* conway proportion */
+        int regbl_count( 0 );
+        int regbl_total( 0 );
 
         /* parsing pixels */
-        for ( int x = 1; x < ( regbl_in.cols - 1 ); x ++ ) {
+        for ( int regbl_x = 0; regbl_x < ( regbl_in.cols ); regbl_x ++ ) {
 
             /* parsing pixels */
-            for ( int y = 1; y < ( regbl_in.rows - 1 ); y ++ ) {
+            for ( int regbl_y = 0; regbl_y < ( regbl_in.rows ); regbl_y ++ ) {
 
-                /* reset counter */
+                /* compute kernel boundaries */
+                regbl_lx = regbl_x - regbl_kernel;
+                regbl_ly = regbl_y - regbl_kernel;
+                regbl_hx = regbl_x + regbl_kernel + 1;
+                regbl_hy = regbl_y + regbl_kernel + 1;
+
+                /* clamp kernel boundaries */
+                regbl_lx = ( regbl_lx < 0 ) ? 0 : regbl_lx;
+                regbl_ly = ( regbl_ly < 0 ) ? 0 : regbl_ly;
+
+                /* clamp kernel boundaries */
+                regbl_hx = ( regbl_hx > regbl_in.cols ) ? regbl_in.cols : regbl_hx;
+                regbl_hy = ( regbl_hy > regbl_in.rows ) ? regbl_in.rows : regbl_hy;
+
+                /* reset proportion */
                 regbl_count = 0;
+                regbl_total = 0;
 
                 /* conway region parser */
-                for ( int u = x - 1; u < ( x + 2 ); u ++ ) {
+                for ( int u = regbl_lx; u < regbl_hx; u ++ ) {
 
                     /* conway region parser */
-                    for ( int v = y - 1; v < ( y + 2 ); v ++ ) {
+                    for ( int v = regbl_ly; v < regbl_hy; v ++ ) {
 
                         /* check region cell state */
                         if ( regbl_in.at<uchar>(v,u) < 128 ) {
@@ -169,252 +188,24 @@
 
                         }
 
+                        /* update total */
+                        regbl_total ++;
+
                     }
 
                 }
 
                 /* cell living condition */
-                if ( regbl_count > regbl_gamevalue ) {
+                if ( ( ( double ) regbl_count / regbl_total ) > regbl_gamevalue ) {
 
                     /* assign binary black */
-                    regbl_out.at<uchar>(y,x) = 0;
-
-                    /* check state */
-                    if ( regbl_in.at<uchar>(y,x) > 128 ) {
-
-                        /* update counter */
-                        regbl_updated ++;
-
-                    }
+                    regbl_out.at<uchar>(regbl_y,regbl_x) = 0;
 
                 }
 
             }
 
         }
-
-        /* return amount of updated cell */
-        return( regbl_updated );
-
-    }
-
-    regbl_component_t regbl_extract_connected( cv::Mat & regbl_in ) {
-
-        /* tracking matrix */
-        cv::Mat regbl_track( cv::Size( regbl_in.cols, regbl_in.rows ), CV_8UC1, cv::Scalar(0));
-
-        /* flood-track neighbour array */
-        int regbl_next[4][2] = { { +0, -1 }, { +0, +1 }, { -1, +0 }, { +1, +0 } };
-
-        /* coordinate push buffer */
-        int regbl_u( 0 ), regbl_v( 0 );
-
-        /* returned component array */
-        regbl_component_t regbl_return;
-
-        /* parsing pixels */
-        for ( int x = 1; x < ( regbl_in.cols - 1 ); x ++ ) {
-
-            /* parsing pixels */
-            for ( int y = 1; y < ( regbl_in.rows - 1 ); y ++ ) {
-
-                /* check pixel state */
-                if ( ( regbl_in.at<uchar>(y,x) < 128 ) && ( regbl_track.at<uchar>(y,x) == 0 ) ) {
-
-                    /* component coordinates array */
-                    std::vector< std::vector< double > > regbl_component{ { double( x ), double( y ) } };
-
-                    /* update tracking */
-                    regbl_track.at<uchar>(y,x) = 255;
-
-                    /* component coordinates head */
-                    unsigned int regbl_head( 0 );
-
-                    /* component pixels gathering */
-                    while ( regbl_head < regbl_component.size() ) {
-
-                        /* parsing connected neighbours */
-                        for ( int regbl_i = 0; regbl_i < 4; regbl_i ++ ) {
-
-                            /* compute pre-pushed coordinates */
-                            regbl_u = regbl_component[regbl_head][0] + regbl_next[regbl_i][0];
-                            regbl_v = regbl_component[regbl_head][1] + regbl_next[regbl_i][1];
-
-                            /* check connectivity */
-                            if ( ( regbl_in.at<uchar>(regbl_v,regbl_u) < 128 ) && ( regbl_track.at<uchar>(regbl_v,regbl_u) == 0 ) ) {
-
-                                /* add pixel to component */
-                                regbl_component.push_back( std::vector< double > { double( regbl_u ), double( regbl_v ) } );
-
-                                /* update tracking */
-                                regbl_track.at<uchar>(regbl_v,regbl_u) = 255;
-
-                            }
-                            
-                        }
-
-                        /* update head */
-                        regbl_head ++;
-
-                    }
-
-                    /* high-pass filter */
-                    if ( regbl_component.size() > 8 ) {
-
-                        /* push component */
-                        regbl_return.push_back( regbl_component );
-
-                    }
-
-                }
-
-            }
-
-        }
-
-        /* return component */
-        return( regbl_return );
-
-    }
-
-    void regbl_process_pca_filtering( cv::Mat & regbl_in, cv::Mat & regbl_out ) {
-
-        /* initialise output matrix */
-        regbl_out = cv::Mat( cv::Size( regbl_in.cols, regbl_in.rows ), CV_8UC1, cv::Scalar(255));
-
-        /* tracking matrix */
-        cv::Mat regbl_track( cv::Size( regbl_in.cols, regbl_in.rows ), CV_8UC1, cv::Scalar(0));
-
-        /* flood-track neighbour array */
-        int regbl_next[4][2] = { { +0, -1 }, { +0, +1 }, { -1, +0 }, { +1, +0 } };
-
-        /* coordinate push buffer */
-        int regbl_u( 0 ), regbl_v( 0 );
-
-        /* parsing pixels */
-        for ( int x = 1; x < ( regbl_in.cols - 1 ); x ++ ) {
-
-            /* parsing pixels */
-            for ( int y = 1; y < ( regbl_in.rows - 1 ); y ++ ) {
-
-                /* check pixel state */
-                if ( ( regbl_in.at<uchar>(y,x) < 128 ) && ( regbl_track.at<uchar>(y,x) == 0 ) ) {
-
-                    /* component coordinates array */
-                    std::vector< std::vector< double > > regbl_component{ { double( x ), double( y ) } };
-
-                    /* update tracking */
-                    regbl_track.at<uchar>(y,x) = 255;
-
-                    /* component coordinates head */
-                    unsigned int regbl_head( 0 );
-
-                    /* component pixels gathering */
-                    while ( regbl_head < regbl_component.size() ) {
-
-                        /* parsing connected neighbours */
-                        for ( int regbl_i = 0; regbl_i < 4; regbl_i ++ ) {
-
-                            /* compute pre-pushed coordinates */
-                            regbl_u = regbl_component[regbl_head][0] + regbl_next[regbl_i][0];
-                            regbl_v = regbl_component[regbl_head][1] + regbl_next[regbl_i][1];
-
-                            /* check connectivity */
-                            if ( ( regbl_in.at<uchar>(regbl_v,regbl_u) < 128 ) && ( regbl_track.at<uchar>(regbl_v,regbl_u) == 0 ) ) {
-
-                                /* add pixel to component */
-                                regbl_component.push_back( std::vector< double > { double( regbl_u ), double( regbl_v ) } );
-
-                                /* update tracking */
-                                regbl_track.at<uchar>(regbl_v,regbl_u) = 255;
-
-                            }
-                            
-                        }
-
-                        /* update head */
-                        regbl_head ++;
-
-                    }
-
-                    if ( regbl_component.size() > 16 ) {
-
-                        for ( unsigned int i = 0; i < regbl_component.size(); i ++ ) {
-
-                            regbl_out.at<uchar>(regbl_component[i][1],regbl_component[i][0]) = 127;
-
-                        }
-
-                    }
-
-                }
-
-            }
-
-        }
-
-    }
-
-    void regbl_process_component_raster( regbl_component_t & regbl_in, cv::Mat & regbl_out, cv::Size regbl_size ) {
-
-        /* initialise output matrix */
-        regbl_out = cv::Mat( regbl_size, CV_8UC1, cv::Scalar(255));
-
-        /* parsing component */
-        for ( unsigned int regbl_i = 0; regbl_i < regbl_in.size(); regbl_i ++ ) {
-
-            /* parsing pixel */
-            for ( unsigned int regbl_j = 0; regbl_j < regbl_in[regbl_i].size(); regbl_j ++ ) {
-
-                /* render pixel */
-                regbl_out.at<uchar>( regbl_in[regbl_i][regbl_j][1], regbl_in[regbl_i][regbl_j][0] ) = 0;
-
-            }
-
-        }
-
-    }
-
-
-/*
-    source - filtering methods
- */
-
-    regbl_component_t regbl_filter_pca( regbl_component_t & regbl_in, double const regbl_ratio ) {
-
-        /* filtered connected components array */
-        regbl_component_t filter;
-
-        /* parsing components */
-        for ( unsigned int i = 0; i < regbl_in.size() ; i ++ ) {
-
-            /* prepare PCA matrix */
-            cv::Mat regbl_pca( regbl_in[i].size(), 2, CV_64F );
-
-            /* parsing components pixels */
-            for ( unsigned int j = 0; j < regbl_in[i].size(); j ++ ) {
-
-                /* compose PCA matrix */
-                regbl_pca.at<double>(j,0) = regbl_in[i][j][0];
-                regbl_pca.at<double>(j,1) = regbl_in[i][j][1];
-
-            }
-
-            /* compute PCA */
-            cv::PCA pca_analysis( regbl_pca, cv::Mat(), cv::PCA::DATA_AS_ROW );
-
-            /* apply filtering condition */
-            if ( ( pca_analysis.eigenvalues.at<double>(1) / pca_analysis.eigenvalues.at<double>(0) ) > regbl_ratio ) {
-
-                /* push unfiltered component */
-                filter.push_back( regbl_in[i] );
-
-            }
-
-        }
-
-        /* returned filtered array */
-        return( filter );
 
     }
 
@@ -433,26 +224,20 @@
         /* exportation path */
         char * regbl_state_path( lc_read_string( argc, argv, "--state", "-s" ) );
 
-        /* inversion state */
-        bool regbl_invert( lc_read_flag( argc, argv, "--invert", "-v" ) );
-
-        /* equalize state */
-        bool regbl_equalize( lc_read_flag( argc, argv, "--equalize", "-e" ) );
-
         /* resize factor */
-        double regbl_resize( lc_read_double( argc, argv, "--factor", "-f", 1.0 ) );
+        double regbl_factor( lc_read_double( argc, argv, "--factor", "-f", 0.5 ) );
 
         /* iteration limit */
-        int regbl_limit( lc_read_signed( argc, argv, "--limit", "-l", 32 ) );
+        int regbl_kernel( lc_read_signed( argc, argv, "--kernel", "-l", 3 ) );
+
+        /* black extraction L2 */
+        int regbl_black( lc_read_signed( argc, argv, "--black", "-b", 64 ) );
 
         /* source image */
         cv::Mat regbl_source, regbl_binary, regbl_swap;
 
         /* state variable */
         int regbl_state( 1 );
-
-        /* iteration parser */
-        int regbl_flag( 0 );
 
         /* component array */
         regbl_component_t regbl_component;
@@ -480,7 +265,7 @@
         }
 
         /* check inversion */
-        if ( regbl_invert == true ) {
+        if ( lc_read_flag( argc, argv, "--invert", "-v" ) == true ) {
 
             /* invert image */
             regbl_source = cv::Scalar(255) - regbl_source;
@@ -496,7 +281,7 @@
         }
 
         /* check equalisation */
-        if ( regbl_equalize == true ) {
+        if ( lc_read_flag( argc, argv, "--equalize", "-e" ) == true ) {
 
             /* equalize image */
             regbl_tool_equalize( regbl_source );
@@ -512,9 +297,7 @@
         }
 
         /* black element extraction */
-        //regbl_process_extract_black( regbl_source, regbl_binary, 96 );
-        //regbl_process_extract_black( regbl_source, regbl_binary, 8 );
-        regbl_process_extract_black( regbl_source, regbl_binary, 64 );
+        regbl_process_extract_black( regbl_source, regbl_binary, regbl_black );
 
         /* check state specification */
         if ( regbl_state_path != NULL ) {
@@ -524,66 +307,19 @@
 
         }
 
-        /* resize binary image */
-        //cv::resize(regbl_binary, regbl_binary, cv::Size(), 1.5, 1.5, cv::INTER_NEAREST);
-        cv::resize(regbl_binary, regbl_binary, cv::Size(), regbl_resize, regbl_resize, cv::INTER_NEAREST);
+        /* apply conway iteration */
+        regbl_process_conway_iteration( regbl_binary, regbl_swap, regbl_kernel, regbl_factor );
 
         /* check state specification */
         if ( regbl_state_path != NULL ) {
 
             /* export state */
-            regbl_state = regbl_io_state( regbl_binary, regbl_state, std::string( regbl_state_path ) );
+            regbl_state = regbl_io_state( regbl_swap, regbl_state, std::string( regbl_state_path ) );
 
         }
-
-        /* initialise conway state */
-        regbl_flag = regbl_limit + 1;
-
-        /* apply conway */
-        while ( regbl_flag > regbl_limit ) {
-
-            /* apply conway iteration and check results */
-            if ( ( regbl_flag = regbl_process_conway_iteration( regbl_binary, regbl_swap, 4 ) ) > 0 ) {
-
-                /* check state specification */
-                if ( regbl_state_path != NULL ) {
-
-                    /* export state */
-                    regbl_state = regbl_io_state( regbl_swap, regbl_state, std::string( regbl_state_path ) );
-
-                }
-
-                std::cerr << regbl_flag << std::endl;
-
-            }
-
-            /* swap matrix */
-            regbl_binary = regbl_swap;
-
-        }
-
-        /* extract connected component */
-        //regbl_component = regbl_extract_connected( regbl_binary );
-
-        /* applying PCA filtering */
-        //regbl_component = regbl_filter_pca( regbl_component, 0.01 );
-
-        /* render component on raster */
-        //regbl_process_component_raster( regbl_component, regbl_binary, cv::Size( regbl_binary.cols, regbl_binary.rows ) );
-
-        /* check state specification */
-        if ( regbl_state_path != NULL ) {
-
-            /* export state */
-            regbl_state = regbl_io_state( regbl_binary, regbl_state, std::string( regbl_state_path ) );
-
-        }
-
-        /* resize to original */
-        cv::resize( regbl_binary, regbl_binary, cv::Size( regbl_source.cols, regbl_source.rows ), 0, 0, cv::INTER_NEAREST );
 
         /* export result image */
-        cv::imwrite( regbl_output_path, regbl_binary );
+        cv::imwrite( regbl_output_path, regbl_swap );
 
         /* system message */
         return( 0 );
