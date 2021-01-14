@@ -69,7 +69,7 @@
         cv::Mat regbl_return( 18, regbl_width, CV_8UC3, cv::Scalar( 0, 0, 0 ) );
 
         /* display reference text */
-        cv::putText( regbl_return, "GEID " + regbl_geid + " - DATE " + regbl_truth, cv::Point( 0, 14 ), cv::FONT_HERSHEY_PLAIN, 1, cv::Scalar( 255, 255, 255 ) );
+        cv::putText( regbl_return, "EGID " + regbl_geid + " - DATE " + regbl_truth, cv::Point( 0, 14 ), cv::FONT_HERSHEY_PLAIN, 1, cv::Scalar( 255, 255, 255 ) );
 
         /* retrun matrix */
         return( regbl_return );
@@ -89,7 +89,7 @@
         char * regbl_location_name( lc_read_string( argc, argv, "--location", "-l" ) );
 
         /* building identifier (GEID) */
-        char * regbl_building_id( lc_read_string( argc, argv, "--geid", "-g" ) );
+        char * regbl_building_id( lc_read_string( argc, argv, "--egid", "-g" ) );
 
         /* exportation directory */
         char * regbl_output_path( lc_read_string( argc, argv, "--export", "-e" ) );
