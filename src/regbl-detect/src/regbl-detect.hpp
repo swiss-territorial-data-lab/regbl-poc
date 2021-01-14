@@ -87,6 +87,10 @@
     header - function prototypes
  */
 
+    /*! ... */
+
+    bool regbl_detect_on_map( cv::Mat & regbl_map, double const regbl_x, double const regbl_y, double const regbl_size );
+
     /*! \brief Processing methods (un-synchronised)
      *
      *  This function performs the actual building detection on the current

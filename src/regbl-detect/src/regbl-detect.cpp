@@ -22,6 +22,57 @@
     # include "regbl-detect.hpp"
 
 /*
+    source - Detection methods
+ */
+
+    bool regbl_detect_on_map( cv::Mat & regbl_map, double const regbl_x, double const regbl_y, double const regbl_size ) {
+
+        /* detection cross pattern */
+        static const int regbl_cross[5][2] = {
+
+            { -1, +0 },
+            { +1, +0 },
+            { +0, +0 },
+            { +0, -1 },
+            { +0, +1 }
+
+        };
+
+        /* detection coordinates */
+        double regbl_u( 0. );
+        double regbl_v( 0. );
+        
+        /* parsing detection cross */
+        for ( int regbl_i = 0; regbl_i < 5; regbl_i ++ ) {
+
+            /* compute detection coordinates */
+            regbl_u = regbl_x + regbl_cross[regbl_i][0] * regbl_size;
+            regbl_v = regbl_y + regbl_cross[regbl_i][1] * regbl_size;
+
+            /* check coordinates */
+            if ( regbl_u < 0 ) continue;
+            if ( regbl_v < 0 ) continue;
+
+            /* check coordinates */
+            if ( regbl_u >= regbl_map.cols ) continue;
+            if ( regbl_v >= regbl_map.rows ) continue;
+
+            /* formal detection */
+            if ( regbl_map.at<uchar>( regbl_v, regbl_u ) < 127.5 ) {
+
+                /* send results */
+                return( true );
+
+            }
+
+        }
+
+        /* send results */
+        return( false );
+
+    }
+
+/*
     source - Processing methods
  */
 
@@ -148,7 +199,7 @@
                 }
 
                 /* detect on map */
-                if ( regbl_map.at<uchar>( regbl_y, regbl_x ) < 127 ) {
+                if ( regbl_detect_on_map( regbl_map, regbl_x, regbl_y, 3 ) == true ) {
 
                     /* export detection result */
                     regbl_output << regbl_year << " 1 " << regbl_x << " " << regbl_y << std::endl;
