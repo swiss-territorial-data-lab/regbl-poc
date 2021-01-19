@@ -39,7 +39,7 @@
         std::string regbl_void;
 
         /* memory token */
-        std::string regbl_memory( "2020" );
+        std::string regbl_memory( "32767" );
 
         /* loop state */
         bool regbl_flag( true );
@@ -69,7 +69,7 @@
                 if ( regbl_state == "0" ) {
 
                     /* check initial state */
-                    if ( regbl_initial == true ) {
+                    //if ( regbl_initial == true ) {
 
                         /* create output stream */
                         regbl_output.open( regbl_export + "/" + std::string( std::filesystem::path( regbl_path ).filename() ), std::ios::out );
@@ -97,7 +97,7 @@
                         /* update detection state */
                         regbl_detected = true;
 
-                    }
+                    //}
 
                 } else {
 
@@ -136,7 +136,7 @@
             }
 
             /* export detected building date range boundary */
-            regbl_output << regbl_memory << " 0";
+            regbl_output << regbl_memory << " -32768";
 
             /* delete output stream */
             regbl_output.close();
