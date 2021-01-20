@@ -105,7 +105,7 @@
         if ( regbl_stream.is_open() == false ) {
 
             /* display message */
-            std::cerr << "error : unable to open database" << std::endl;
+            std::cerr << "error : unable to open GEB database" << std::endl;
 
             /* abort */
             exit( 1 );
@@ -119,7 +119,7 @@
         if ( ( regbl_EGID  = regbl_detect_database_header( regbl_head, "EGID"  ) ) < 0 ) {
 
             /* display message */
-            std::cerr << "error : unable to locate EGID in database" << std::endl;
+            std::cerr << "error : unable to locate EGID in GEB database" << std::endl;
 
             /* abort */
             exit( 1 );
@@ -130,7 +130,7 @@
         if ( ( regbl_GKODE = regbl_detect_database_header( regbl_head, "GKODE" ) ) < 0 ) {
 
             /* display message */
-            std::cerr << "error : unable to locate GKODE in database" << std::endl;
+            std::cerr << "error : unable to locate GKODE in GEB database" << std::endl;
 
             /* abort */
             exit( 1 );
@@ -141,7 +141,7 @@
         if ( ( regbl_GKODN = regbl_detect_database_header( regbl_head, "GKODN" ) ) < 0 ) {
 
             /* display message */
-            std::cerr << "error : unable to locate GKODN in database" << std::endl;
+            std::cerr << "error : unable to locate GKODN in GEB database" << std::endl;
 
             /* abort */
             exit( 1 );
@@ -152,7 +152,7 @@
         if ( ( regbl_GBAUJ = regbl_detect_database_header( regbl_head, "GBAUJ" ) ) < 0 ) {
 
             /* display message */
-            std::cerr << "error : unable to locate GBAUJ in database" << std::endl;
+            std::cerr << "error : unable to locate GBAUJ in GEB database" << std::endl;
 
             /* abort */
             exit( 1 );
@@ -260,7 +260,7 @@
         if ( regbl_stream.is_open() == false ) {
 
             /* display message */
-            std::cerr << "error : unable to open database" << std::endl;
+            std::cerr << "error : unable to open GEB database" << std::endl;
 
             /* abort */
             exit( 1 );
@@ -274,7 +274,7 @@
         if ( ( regbl_EGID  = regbl_detect_database_header( regbl_head, "EGID"  ) ) < 0 ) {
 
             /* display message */
-            std::cerr << "error : unable to locate EGID in database" << std::endl;
+            std::cerr << "error : unable to locate EGID in GEB database" << std::endl;
 
             /* abort */
             exit( 1 );
@@ -285,7 +285,7 @@
         if ( ( regbl_GKODE = regbl_detect_database_header( regbl_head, "GKODE" ) ) < 0 ) {
 
             /* display message */
-            std::cerr << "error : unable to locate GKODE in database" << std::endl;
+            std::cerr << "error : unable to locate GKODE in GEB database" << std::endl;
 
             /* abort */
             exit( 1 );
@@ -296,7 +296,7 @@
         if ( ( regbl_GKODN = regbl_detect_database_header( regbl_head, "GKODN" ) ) < 0 ) {
 
             /* display message */
-            std::cerr << "error : unable to locate GKODN in database" << std::endl;
+            std::cerr << "error : unable to locate GKODN in GEB database" << std::endl;
 
             /* abort */
             exit( 1 );
@@ -307,7 +307,7 @@
         if ( ( regbl_GBAUJ = regbl_detect_database_header( regbl_head, "GBAUJ" ) ) < 0 ) {
 
             /* display message */
-            std::cerr << "error : unable to locate GBAUJ in database" << std::endl;
+            std::cerr << "error : unable to locate GBAUJ in GEB database" << std::endl;
 
             /* abort */
             exit( 1 );
@@ -367,6 +367,222 @@
 
     }
 
+    void regbl_detect_position( char const * const regbl_database, char const * const regbl_entries, std::string & regbl_export, double const regbl_xmin, double const regbl_xmax, double const regbl_ymin, double const regbl_ymax ) {
+
+        /* reading buffers */
+        char regbl_head[REGBL_BUFFER] = { 0 };
+        char regbl_line[REGBL_BUFFER] = { 0 };
+
+        /* reading token */
+        char regbl_token[REGBL_BUFFER] = { 0 };
+        char regbl_ident[REGBL_BUFFER] = { 0 };
+
+        /* building database index */
+        int regbl_database_EGID ( 0 );
+        int regbl_database_GKODE( 0 );
+        int regbl_database_GKODN( 0 );
+
+        /* entries database index */
+        int regbl_entries_EGID ( 0 );
+        int regbl_entries_DKODE( 0 );
+        int regbl_entries_DKODN( 0 );
+
+        /* coordinates variable */
+        double regbl_x( 0. );
+        double regbl_y( 0. );
+
+        /* exportation stream */
+        std::ofstream regbl_output;
+
+        /* create database stream */
+        std::ifstream regbl_database_stream( regbl_database, std::ifstream::in );
+
+        /* check stream */
+        if ( regbl_database_stream.is_open() == false ) {
+
+            /* display message */
+            std::cerr << "error : unable to open GEB database" << std::endl;
+
+            /* abort */
+            exit( 1 );
+
+        }
+
+        /* import database header */
+        regbl_database_stream.getline( regbl_head, REGBL_BUFFER );
+
+        /* detect and check entry */
+        if ( ( regbl_database_EGID  = regbl_detect_database_header( regbl_head, "EGID"  ) ) < 0 ) {
+
+            /* display message */
+            std::cerr << "error : unable to locate EGID in GEB database" << std::endl;
+
+            /* abort */
+            exit( 1 );
+
+        }
+
+        /* detect and check entry */
+        if ( ( regbl_database_GKODE = regbl_detect_database_header( regbl_head, "GKODE" ) ) < 0 ) {
+
+            /* display message */
+            std::cerr << "error : unable to locate GKODE in GEB database" << std::endl;
+
+            /* abort */
+            exit( 1 );
+
+        }
+
+        /* detect and check entry */
+        if ( ( regbl_database_GKODN = regbl_detect_database_header( regbl_head, "GKODN" ) ) < 0 ) {
+
+            /* display message */
+            std::cerr << "error : unable to locate GKODN in GEB database" << std::endl;
+
+            /* abort */
+            exit( 1 );
+
+        }
+
+        /* create database stream */
+        std::ifstream regbl_entries_stream( regbl_entries, std::ifstream::in );
+
+        /* check stream */
+        if ( regbl_entries_stream.is_open() == false ) {
+
+            /* display message */
+            std::cerr << "error : unable to open EIN database" << std::endl;
+
+            /* abort */
+            exit( 1 );
+
+        }
+
+        /* import database header */
+        regbl_entries_stream.getline( regbl_head, REGBL_BUFFER );
+
+        /* detect and check entry */
+        if ( ( regbl_entries_EGID = regbl_detect_database_header( regbl_head, "EGID"  ) ) < 0 ) {
+
+            /* display message */
+            std::cerr << "error : unable to locate EGID in EIN database" << std::endl;
+
+            /* abort */
+            exit( 1 );
+
+        }
+
+        /* detect and check entry */
+        if ( ( regbl_entries_DKODE = regbl_detect_database_header( regbl_head, "DKODE"  ) ) < 0 ) {
+
+            /* display message */
+            std::cerr << "error : unable to locate DKODE in EIN database" << std::endl;
+
+            /* abort */
+            exit( 1 );
+
+        }
+
+        /* detect and check entry */
+        if ( ( regbl_entries_DKODN = regbl_detect_database_header( regbl_head, "DKODN"  ) ) < 0 ) {
+
+            /* display message */
+            std::cerr << "error : unable to locate DKODN in EIN database" << std::endl;
+
+            /* abort */
+            exit( 1 );
+
+        }
+
+        /* parsing database entries */
+        while ( regbl_database_stream.getline( regbl_line, REGBL_BUFFER ) ) {
+
+            /* read coordinates token */
+            regbl_detect_database_entry( regbl_line, regbl_database_GKODE, regbl_token );
+
+            /* convert token */
+            regbl_x = std::atof( regbl_token );
+
+            /* read coordinates token */
+            regbl_detect_database_entry( regbl_line, regbl_database_GKODN, regbl_token );
+
+            /* convert token */
+            regbl_y = std::atof( regbl_token );
+
+            /* check coordinates boundaries */
+            if ( ( regbl_x >= regbl_xmin ) && ( regbl_x < regbl_xmax ) && ( regbl_y >= regbl_ymin ) && ( regbl_y < regbl_ymax ) ) {
+
+                /* read EGID token */
+                regbl_detect_database_entry( regbl_line, regbl_database_EGID, regbl_ident );
+
+                /* reset stream */
+                regbl_entries_stream.clear();
+                regbl_entries_stream.seekg( 0 );
+
+                /* create output stream */
+                regbl_output.open( regbl_export + "/" + std::string( regbl_ident ), std::ofstream::out );
+
+                /* check stream */
+                if ( regbl_output.is_open() == false ) {
+
+                    /* display messsage */
+                    std::cerr << "error : unable to write position file" << std::endl;
+
+                    /* abort */
+                    exit( 1 );
+
+                }
+
+                /* export building position */
+                regbl_output << std::setprecision(3) << std::fixed << regbl_x << " " << regbl_y << std::endl;
+
+                /* import header line */
+                regbl_entries_stream.getline( regbl_head, REGBL_BUFFER );
+
+                /* parsing database entries */
+                while ( regbl_entries_stream.getline( regbl_line, REGBL_BUFFER ) ) {
+
+                    /* read EGID token */
+                    regbl_detect_database_entry( regbl_line, regbl_entries_EGID, regbl_token );
+
+                    /* detect EGID identity */
+                    if ( strcmp( regbl_ident, regbl_token ) == 0 ) {
+
+                        /* read coordinates token */
+                        regbl_detect_database_entry( regbl_line, regbl_entries_DKODE, regbl_token );
+
+                        /* check token consistency */
+                        if ( std::strlen( regbl_token ) > 0 ) {
+
+                            /* export token */
+                            regbl_output << regbl_token << " ";
+
+                            /* read coordinates token */
+                            regbl_detect_database_entry( regbl_line, regbl_entries_DKODN, regbl_token );
+
+                            /* export token */
+                            regbl_output << regbl_token << std::endl;
+
+                        }
+
+                    }
+
+                }
+
+                /* delete output stream */
+                regbl_output.close();
+
+            }
+
+        }
+
+        /* delete entries stream */
+        regbl_entries_stream.close();
+
+        /* delete database stream */
+        regbl_database_stream.close(); 
+
+    }
 /*
     source - Database methods
  */
@@ -495,8 +711,11 @@
         /* storage structure path */
         char * regbl_storage_path( lc_read_string( argc, argv, "--storage", "-s" ) );
 
-        /* database input */
+        /* database path */
         char * regbl_database_path( lc_read_string( argc, argv, "--database", "-d" ) );
+
+        /* entries database path */
+        char * regbl_entries_path( lc_read_string( argc, argv, "--entries", "-e" ) );
 
         /* storage list stream */
         std::ifstream regbl_list;
@@ -518,6 +737,7 @@
         std::string regbl_reference;
         std::string regbl_frame;
         std::string regbl_database;
+        std::string regbl_position;
 
         /* check path specification */
         if ( regbl_storage_path == NULL ) {
@@ -534,10 +754,18 @@
         if ( regbl_database_path == NULL ) {
 
             /* display message */
-            std::cerr << "error : database path specification" << std::endl;
+            std::cerr << "error : GEB database path specification" << std::endl;
 
             /* abort */
             return( 1 );
+
+        }
+
+        /* check path specification */
+        if ( regbl_entries_path == NULL ) {
+
+            /* display message */
+            std::cerr << "error : EIN database path specification " << std::endl;
 
         }
 
@@ -594,6 +822,20 @@
                     }
 
                     /* create path */
+                    regbl_position = regbl_export + "/output_position/position_" + regbl_location;
+
+                    /* check directory */
+                    if ( std::filesystem::is_directory( regbl_position ) == false ) {
+
+                        /* create directory */
+                        std::filesystem::create_directories( regbl_position );
+
+                        /* process entries */
+                        regbl_detect_position( regbl_database_path, regbl_entries_path, regbl_position, std::stod( regbl_xmin, NULL ), std::stod( regbl_xmax, NULL ), std::stod( regbl_ymin, NULL ), std::stod( regbl_ymax, NULL ) );
+
+                    }
+
+                    /* create path */
                     regbl_database = regbl_export + "/output_database/database_" + regbl_location;
 
                     /* check directory */
@@ -627,7 +869,7 @@
                 } else {
 
                     /* display message */
-                    std::cerr << "error : unable to access map" << std::endl;
+                    std::cerr << "error : unable to access " << regbl_location << " map in " << regbl_year << std::endl;
 
                     /* abort */
                     return( 1 );

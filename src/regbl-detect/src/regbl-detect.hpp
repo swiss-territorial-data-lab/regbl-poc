@@ -190,6 +190,10 @@
 
     void regbl_detect_reference( char const * const regbl_database, std::string & regbl_export, double const regbl_xmin, double const regbl_xmax, double const regbl_ymin, double const regbl_ymax );
 
+    /*! ... */
+
+    void regbl_detect_position( char const * const regbl_database, char const * const regbl_entries, std::string & regbl_export, double const regbl_xmin, double const regbl_xmax, double const regbl_ymin, double const regbl_ymax );
+
     /*! \brief Database methods
      *
      *  This function is used to compute the index of an DSV database entry
