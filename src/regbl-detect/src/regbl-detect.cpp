@@ -73,8 +73,109 @@
     }
 
 /*
-    source - Processing methods
+    source - Detection methods
  */
+
+    void regbl_detect_( cv::Mat & regbl_map, cv::Mat & regbl_track, std::string & regbl_import, std::string & regbl_export, std::string & regbl_year, double const regbl_xmin, double const regbl_xmax, double const regbl_ymin, double const regbl_ymax ) {
+
+        /* input stream */
+        std::ifstream regbl_input;
+
+        /* output stream */
+        std::ofstream regbl_output;
+
+        /* position coordinates */
+        double regbl_x( 0. );
+        double regbl_y( 0. );
+
+        /* parsing position database */
+        for ( const std::filesystem::directory_entry & regbl_file : std::filesystem::directory_iterator( regbl_import ) ) {
+
+            /* check for regular file only */
+            if ( regbl_file.is_regular_file() == true ) {
+
+                /* create input stream */
+                regbl_input.open( regbl_file.path(), std::ifstream::in );
+
+                /* check input stream */
+                if ( regbl_input.is_open() == false ) {
+
+                    /* display message */
+                    std::cerr << "error : unable to access position database" << std::endl;
+
+                    /* send message */
+                    exit( 1 );
+
+                }
+
+                /* import building position */
+                if ( regbl_input >> regbl_x >> regbl_y ) {
+
+                    /* check coordinates boundaries */
+                    if ( ( regbl_x >= regbl_xmin ) && ( regbl_x < regbl_xmax ) && ( regbl_y >= regbl_ymin ) && ( regbl_y < regbl_ymax ) ) {
+
+                        /* convert geographical coordinates to map pixel coordinates */
+                        regbl_x = ( ( regbl_x - regbl_xmin ) / ( regbl_xmax - regbl_xmin ) ) * regbl_map.cols;
+                        regbl_y = ( ( regbl_y - regbl_ymin ) / ( regbl_ymax - regbl_ymin ) ) * regbl_map.rows;
+
+                        /* create output stream */
+                        regbl_output.open( regbl_export + "/" + std::string( regbl_file.path().filename() ), std::ofstream::out | std::ofstream::app );
+
+                        /* check stream */
+                        if ( regbl_output.is_open() == false ) {
+
+                            /* display message */
+                            std::cerr << "error : unable to write detection file" << std::endl;
+
+                            /* abort */
+                            exit( 1 );
+
+                        }
+
+                        /* detect on map */
+                        if ( regbl_detect_on_map( regbl_map, regbl_x, regbl_y, 3 ) == true ) {
+
+                            /* export detection result */
+                            regbl_output << regbl_year << " 1 " << regbl_x << " " << regbl_y << std::endl;
+
+                            /* update traking map */
+                            cv::line( regbl_track, cv::Point( regbl_x    , regbl_y - 3 ), cv::Point( regbl_x    , regbl_y + 3 ), cv::Scalar( 0, 255, 0, 255 ) );
+                            cv::line( regbl_track, cv::Point( regbl_x - 3, regbl_y     ), cv::Point( regbl_x + 3, regbl_y     ), cv::Scalar( 0, 255, 0, 255 ) );
+
+                        } else {
+
+                            /* export detection result */
+                            regbl_output << regbl_year << " 0 " << regbl_x << " " << regbl_y <<  std::endl;
+
+                            /* update traking map */
+                            cv::line( regbl_track, cv::Point( regbl_x    , regbl_y - 3 ), cv::Point( regbl_x    , regbl_y + 3 ), cv::Scalar( 0, 0, 255, 255 ) );
+                            cv::line( regbl_track, cv::Point( regbl_x - 3, regbl_y     ), cv::Point( regbl_x + 3, regbl_y     ), cv::Scalar( 0, 0, 255, 255 ) );
+
+                        }
+
+                        /* delete output stream */
+                        regbl_output.close();
+
+                    }
+
+                } else {
+
+                    /* display message */
+                    std::cerr << "error : unable to import position coordinates from position database" << std::endl;
+
+                    /* send message */
+                    exit( 1 );
+
+                }
+
+                /* delete stream */
+                regbl_input.close();
+
+            }
+
+        }
+
+    }
 
     void regbl_detect( char const * const regbl_database, cv::Mat & regbl_map, cv::Mat & regbl_track, std::string & regbl_export, std::string & regbl_year, double const regbl_xmin, double const regbl_xmax, double const regbl_ymin, double const regbl_ymax ) {
 
@@ -230,6 +331,10 @@
         regbl_stream.close(); 
 
     }
+
+/*
+    source - Extraction methods
+ */
 
     void regbl_detect_reference( char const * const regbl_database, std::string & regbl_export, double const regbl_xmin, double const regbl_xmax, double const regbl_ymin, double const regbl_ymax ) {
 
@@ -847,7 +952,8 @@
                     }
 
                     /* process detection */
-                    regbl_detect( regbl_database_path, regbl_map, regbl_track, regbl_database, regbl_year, std::stod( regbl_xmin, NULL ), std::stod( regbl_xmax, NULL ), std::stod( regbl_ymin, NULL ), std::stod( regbl_ymax, NULL ) );
+                    //regbl_detect( regbl_database_path, regbl_map, regbl_track, regbl_database, regbl_year, std::stod( regbl_xmin, NULL ), std::stod( regbl_xmax, NULL ), std::stod( regbl_ymin, NULL ), std::stod( regbl_ymax, NULL ) );
+                    regbl_detect_( regbl_map, regbl_track, regbl_position, regbl_database, regbl_year, std::stod( regbl_xmin, NULL ), std::stod( regbl_xmax, NULL ), std::stod( regbl_ymin, NULL ), std::stod( regbl_ymax, NULL ) );
 
                     /* create path */
                     regbl_frame = regbl_export + "/output_frame/frame_" + regbl_location;
