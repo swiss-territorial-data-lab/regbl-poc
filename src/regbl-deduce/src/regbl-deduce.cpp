@@ -25,10 +25,10 @@
     source - Processing methods
  */
 
-    void regbl_deduce_detect( std::string regbl_path, std::string & regbl_export ) {
+    void regbl_deduce_detect( std::string regbl_detect, std::string regbl_deduce ) {
 
         /* input stream */
-        std::ifstream regbl_input( regbl_path, std::ios::in );
+        std::ifstream regbl_input;
 
         /* output stream */
         std::ofstream regbl_output;
@@ -45,14 +45,16 @@
         bool regbl_flag( true );
 
         /* detection state */
-        bool regbl_initial( false );
         bool regbl_detected( false );
+
+        /* create input stream */
+        regbl_input.open( regbl_detect, std::ifstream::in );
 
         /* check consistency */
         if ( regbl_input.is_open() == false ) {
 
             /* display message */
-            std::cerr << "error : unable to access database building file" << std::endl;
+            std::cerr << "error : unable to access detection file" << std::endl;
 
             /* send message */
             exit( 1 );
@@ -68,41 +70,31 @@
                 /* check flag state */
                 if ( regbl_state == "0" ) {
 
-                    /* check initial state */
-                    //if ( regbl_initial == true ) {
+                    /* create output stream */
+                    regbl_output.open( regbl_deduce, std::ofstream::out );
 
-                        /* create output stream */
-                        regbl_output.open( regbl_export + "/" + std::string( std::filesystem::path( regbl_path ).filename() ), std::ios::out );
+                    /* check consistency */
+                    if ( regbl_output.is_open() == false ) {
 
-                        /* check consistency */
-                        if ( regbl_output.is_open() == false ) {
+                        /* display message */
+                        std::cerr << "error : unable to write deduction file" << std::endl;
 
-                            /* display message */
-                            std::cerr << "error : unable to access database building exportation file" << std::endl;
+                        /* send message */
+                        exit( 1 );
 
-                            /* send message */
-                            exit( 1 );
+                    }
 
-                        }
+                    /* export detected building date range boundary */
+                    regbl_output << regbl_memory << " " << regbl_date;
 
-                        /* export detected building date range boundary */
-                        regbl_output << regbl_memory << " " << regbl_date;
+                    /* delete output stream */
+                    regbl_output.close();
 
-                        /* delete output stream */
-                        regbl_output.close();
+                    /* update detection state */
+                    regbl_detected = true;
 
-                        /* update loop state */
-                        regbl_flag = false;
-
-                        /* update detection state */
-                        regbl_detected = true;
-
-                    //}
-
-                } else {
-
-                    /* update initial state */
-                    regbl_initial = true;
+                    /* update loop state */
+                    regbl_flag = false;
 
                 }
 
@@ -122,13 +114,13 @@
         if ( regbl_detected == false ) {
 
             /* create output stream */
-            regbl_output.open( regbl_export + "/" + std::string( std::filesystem::path( regbl_path ).filename() ), std::ios::out );
+            regbl_output.open( regbl_deduce, std::ofstream::out );
 
             /* check consistency */
             if ( regbl_output.is_open() == false ) {
 
                 /* display message */
-                std::cerr << "error : unable to access database building exportation file" << std::endl;
+                std::cerr << "error : unable to write deduction file" << std::endl;
 
                 /* send message */
                 exit( 1 );
@@ -157,23 +149,19 @@
         /* storage structure path */
         char * regbl_storage_path( lc_read_string( argc, argv, "--storage", "-s" ) );
 
-        /* location name */
-        std::string regbl_location;
+        /* egid */
+        std::string regbl_egid;
 
-        /* path variable */
-        std::string regbl_database;
-        std::string regbl_reference;
-        std::string regbl_export;
-        std::string regbl_export_location;
+        /* path composition */
+        std::string regbl_export_egid;
+        std::string regbl_export_detect;
+        std::string regbl_export_deduce;
 
-        /* compose path */
-        regbl_database = std::string( regbl_storage_path ) + "/regbl_output/output_database";
+        /* check path specification */
+        if ( regbl_storage_path == NULL ) {
 
-        /* check consistency */
-        if ( std::filesystem::is_directory( regbl_database ) == false ) {
-
-            /* display message */
-            std::cerr << "error : database directory missing (unprocessed data)" << std::endl;
+            /* displays message */
+            std::cerr << "error : storage path specification" << std::endl;
 
             /* send message */
             return( 1 );
@@ -181,13 +169,13 @@
         }
 
         /* compose path */
-        regbl_reference = std::string( regbl_storage_path ) + "/regbl_output/output_reference";
+        regbl_export_egid = std::string( regbl_storage_path ) + "/regbl_output/output_egid";
 
         /* check consistency */
-        if ( std::filesystem::is_directory( regbl_reference ) == false ) {
+        if ( std::filesystem::is_directory( regbl_export_egid ) == false ) {
 
             /* display message */
-            std::cerr << "error : reference directory missing (unprocessed data)" << std::endl;
+            std::cerr << "error : unable to locate egid directory" << std::endl;
 
             /* send message */
             return( 1 );
@@ -195,49 +183,49 @@
         }
 
         /* compose path */
-        regbl_export = std::string( regbl_storage_path ) + "/regbl_output/output_deduce";
+        regbl_export_detect = std::string( regbl_storage_path ) + "/regbl_output/output_detect";
 
         /* check consistency */
-        if ( std::filesystem::is_directory( regbl_export ) == true ) {
+        if ( std::filesystem::is_directory( regbl_export_egid ) == false ) {
 
             /* display message */
-            std::cerr << "error : structure already processed" << std::endl;
+            std::cerr << "error : unable to locate detect directory" << std::endl;
 
             /* send message */
             return( 1 );
 
         }
 
-        /* create directory */
-        std::filesystem::create_directories( regbl_export );
+        /* compose path */
+        regbl_export_deduce = std::string( regbl_storage_path ) + "/regbl_output/output_deduce";
 
-        /* parsing location database */
-        for ( const std::filesystem::directory_entry & regbl_locs : std::filesystem::directory_iterator( regbl_database ) ) {
+        /* check consistency */
+        if ( std::filesystem::is_directory( regbl_export_deduce ) == false ) {
 
-            /* check for directory only */
-            if ( regbl_locs.is_directory() == true ) {
+            /* create directory */
+            std::filesystem::create_directories( regbl_export_deduce );
 
-                /* extract location name */
-                regbl_location = std::string( regbl_locs.path() ).substr( std::string( regbl_locs.path() ).rfind("_") + 1 );
+        } else {
 
-                //std::cerr << regbl_locs.path() << " " << regbl_location << std::endl;
-                
-                /* parsing file in location database */
-                for ( const std::filesystem::directory_entry & regbl_file : std::filesystem::directory_iterator( regbl_locs.path() ) ) {
+            /* display message */
+            std::cerr << "error : deduce directory already processed" << std::endl;
 
-                    /* compose path */
-                    regbl_export_location = regbl_export + "/deduce_" + regbl_location;
+            /* send message */
+            return( 1 );
 
-                    /* create directory */
-                    std::filesystem::create_directories( regbl_export_location );
+        }
 
-                    //std::cerr << regbl_file << std::endl;
+        /* parsing egid */
+        for ( const std::filesystem::directory_entry & regbl_file : std::filesystem::directory_iterator( regbl_export_egid ) ) {
 
-                    /* detection process */
-                    regbl_deduce_detect( regbl_file.path(), regbl_export_location );
+            /* check for regular file */
+            if ( regbl_file.is_regular_file() == true ) {
 
-                }
+                /* extract egid */
+                regbl_egid = regbl_file.path().filename();
 
+                /* deduction process */
+                regbl_deduce_detect( regbl_export_detect + "/" + regbl_egid, regbl_export_deduce + "/" + regbl_egid );                
 
             }
 
@@ -247,3 +235,4 @@
         return( 0 );
 
     }
+

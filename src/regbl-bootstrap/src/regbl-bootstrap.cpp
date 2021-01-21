@@ -193,7 +193,7 @@
                 for ( unsigned int regbl_parse = 0; regbl_parse < regbl_list.size(); regbl_parse ++ ) {
 
                     /* create output stream */
-                    regbl_output.open( regbl_export_position + "/" + regbl_token + "_" + regbl_list[regbl_parse][0], std::ofstream::out );
+                    regbl_output.open( regbl_export_position + "/" + regbl_list[regbl_parse][0] + "/" + regbl_token, std::ofstream::out );
 
                     /* check output stream */
                     if ( regbl_output.is_open() == false ) {
@@ -382,7 +382,7 @@
                             for ( unsigned int regbl_parse = 0; regbl_parse < regbl_list.size(); regbl_parse ++ ) {
 
                                 /* create output stream */
-                                regbl_output.open( regbl_export_position + "/" + regbl_token + "_" + regbl_list[regbl_parse][0], std::ofstream::app );
+                                regbl_output.open( regbl_export_position + "/" + regbl_list[regbl_parse][0] + "/" + regbl_token, std::ofstream::app );
 
                                 /* check output stream */
                                 if ( regbl_output.is_open() == false ) {
@@ -590,10 +590,10 @@
 
         }
 
-        /* import list */
+        /* import storage list */
         regbl_list = lc_list_import( std::string( regbl_storage_path ) + "/regbl_list" );
 
-        /* check list */
+        /* check storage list */
         if ( regbl_list.size() == 0 ) {
 
             /* display message */
@@ -621,8 +621,13 @@
         /* check directory */
         if ( std::filesystem::is_directory( regbl_export_position ) == false ) {
 
-            /* create directory */
-            std::filesystem::create_directories( regbl_export_position );
+            /* create year directories */
+            for ( unsigned int regbl_parse = 0; regbl_parse < regbl_list.size(); regbl_parse ++ ) {
+
+                /* create directory */
+                std::filesystem::create_directories( regbl_export_position + "/" + regbl_list[regbl_parse][0] );
+
+            }
 
         }  
 

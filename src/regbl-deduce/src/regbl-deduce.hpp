@@ -78,7 +78,11 @@
     header - function prototypes
  */
 
-    void regbl_deduce_detect( std::string regbl_path, std::string & regbl_export );
+    /*! ... */
+
+    void regbl_deduce_detect( std::string regbl_detect, std::string regbl_deduce );
+
+    /*! ... */
 
     int main( int argc, char ** argv );
 
