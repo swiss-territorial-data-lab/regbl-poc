@@ -25,13 +25,10 @@
     source - Processing methods
  */
 
-    void regbl_tracker_crop( cv::Mat & regbl_crop, int const regbl_cnx, int const regbl_cny, std::string & regbl_date, int const regbl_detect ) {
+    void regbl_tracker_crop( cv::Mat & regbl_crop, int const regbl_cnx, int const regbl_cny, int const regbl_detect ) {
 
         /* color value */
         cv::Scalar regbl_color;
-
-        /* text shift value */
-        int regbl_shift( ( regbl_crop.cols - ( REGBL_TRACKER_CROPHALF * 2 ) ) / 2 );
 
         /* check detection result */
         if ( regbl_detect == 0 ) {
@@ -48,30 +45,114 @@
 
         /* draw edge overlay */
         cv::rectangle( regbl_crop, cv::Rect( 0, 0, regbl_crop.cols, regbl_crop.rows ), regbl_color, 1 );
-
-        /* draw text background */
-        cv::rectangle( regbl_crop, cv::Rect( 0, 0, regbl_crop.cols, 18 ), regbl_color, cv::FILLED );
-
-        /* display crop date */
-        cv::putText( regbl_crop, regbl_date, cv::Point( 40 + regbl_shift, 14 ), cv::FONT_HERSHEY_PLAIN, 1, cv::Scalar( 255, 255, 255 ) );
+        
+        /* display central cross */
+        cv::line( regbl_crop, cv::Point( regbl_cnx, 0 ), cv::Point(regbl_cnx, regbl_cny - REGBL_TRACKER_CROSHALF * 0.75 ), regbl_color );
+        cv::line( regbl_crop, cv::Point( 0, regbl_cny ), cv::Point(regbl_cnx - REGBL_TRACKER_CROSHALF * 0.75, regbl_cny ), regbl_color );
 
         /* display central cross */
-        cv::line( regbl_crop, cv::Point( regbl_cnx, regbl_cny + 2 ), cv::Point(regbl_cnx, regbl_cny + REGBL_TRACKER_CROSHALF ), regbl_color );
-        cv::line( regbl_crop, cv::Point( regbl_cnx, regbl_cny - 2 ), cv::Point(regbl_cnx, regbl_cny - REGBL_TRACKER_CROSHALF ), regbl_color );
-        cv::line( regbl_crop, cv::Point( regbl_cnx + 2, regbl_cny ), cv::Point(regbl_cnx + REGBL_TRACKER_CROSHALF, regbl_cny ), regbl_color );
-        cv::line( regbl_crop, cv::Point( regbl_cnx - 2, regbl_cny ), cv::Point(regbl_cnx - REGBL_TRACKER_CROSHALF, regbl_cny ), regbl_color );
+        cv::line( regbl_crop, cv::Point( regbl_cnx, regbl_crop.rows ), cv::Point(regbl_cnx, regbl_cny + REGBL_TRACKER_CROSHALF * 0.75 ), regbl_color );
+        cv::line( regbl_crop, cv::Point( regbl_crop.cols, regbl_cny ), cv::Point(regbl_cnx + REGBL_TRACKER_CROSHALF * 0.75, regbl_cny ), regbl_color );
+
 
     }
 
-    cv::Mat regbl_tracker_reference( int const regbl_width, std::string regbl_geid, std::string & regbl_truth ) {
+    void regbl_tracker_building( cv::Mat & regbl_crop, int const regbl_cnx, int const regbl_cny, std::ifstream & regbl_stream, int const regbl_detect ) {
+
+        /* color value */
+        cv::Scalar regbl_color;
+
+        /* importation token */
+        double regbl_cx( 0. );
+        double regbl_cy( 0. );
+        double regbl_ux( 0. );
+        double regbl_uy( 0. );
+
+        /* check detection result */
+        if ( regbl_detect == 0 ) {
+
+            /* assign color */
+            regbl_color = cv::Scalar( 78, 66, 192 );
+
+        } else {
+
+            /* assign color */
+            regbl_color = cv::Scalar( 98, 142, 22 );
+
+        }
+
+        /* display central position */
+        cv::circle( regbl_crop, cv::Point( regbl_cnx, regbl_cny ), 1, regbl_color, cv::FILLED );
+
+        /* clear stream */
+        regbl_stream.clear();
+        regbl_stream.seekg(0);
+
+        /* import central position */
+        regbl_stream >> regbl_cx >> regbl_cy;
+
+        /* parsing remaining position */
+        while ( regbl_stream >> regbl_ux >> regbl_uy ) {
+
+            /* shift to center */
+            regbl_ux -= regbl_cx;
+            regbl_uy -= regbl_cy;
+
+            /* round and compute position */
+            regbl_ux = regbl_cnx + std::round( regbl_ux );
+            regbl_uy = regbl_cny - std::round( regbl_uy );
+
+            /* display entires position */
+            cv::circle( regbl_crop, cv::Point( regbl_ux, regbl_uy ), 1, regbl_color, cv::FILLED );
+
+            /* draw linking line */
+            cv::line( regbl_crop, cv::Point( regbl_cnx, regbl_cny ), cv::Point( regbl_ux, regbl_uy ), regbl_color );
+
+        }
+
+    }
+
+    cv::Mat regbl_tracker_timeline( int const regbl_width, std::string regbl_year, int const regbl_detect ) {
+
+        /* text shift value */
+        int regbl_shift( ( regbl_width - ( REGBL_TRACKER_CROPHALF * 2 ) ) / 2 );
+
+        /* color value */
+        cv::Scalar regbl_color;
+
+        /* check detection result */
+        if ( regbl_detect == 0 ) {
+
+            /* assign color */
+            regbl_color = cv::Scalar( 78, 66, 192 );
+
+        } else {
+
+            /* assign color */
+            regbl_color = cv::Scalar( 98, 142, 22 );
+
+        }
+
+        /* returned matrix */
+        cv::Mat regbl_return( 18, regbl_width, CV_8UC3, regbl_color );
+
+        /* display crop date */
+        cv::putText( regbl_return, regbl_year, cv::Point( 40 + regbl_shift, 14 ), cv::FONT_HERSHEY_PLAIN, 1, cv::Scalar( 255, 255, 255 ) );
+
+        /* return matrix */
+        return( regbl_return );
+
+    }
+
+    cv::Mat regbl_tracker_reference( int const regbl_width, std::string regbl_geid, std::string regbl_year ) {
 
         /* returned matrix */
         cv::Mat regbl_return( 18, regbl_width, CV_8UC3, cv::Scalar( 0, 0, 0 ) );
 
         /* display reference text */
-        cv::putText( regbl_return, "EGID " + regbl_geid + " - DATE " + regbl_truth, cv::Point( 0, 14 ), cv::FONT_HERSHEY_PLAIN, 1, cv::Scalar( 255, 255, 255 ) );
+        cv::putText( regbl_return, "EGID " + regbl_geid + " - DATE " + regbl_year, cv::Point( 0, 14 ), cv::FONT_HERSHEY_PLAIN, 1, cv::Scalar( 255, 255, 255 ) );
 
-        /* retrun matrix */
+        /* return matrix */
         return( regbl_return );
 
     }
@@ -85,31 +166,27 @@
         /* storage structure path */
         char * regbl_storage_path( lc_read_string( argc, argv, "--storage", "-s" ) );
 
-        /* location name */
-        char * regbl_location_name( lc_read_string( argc, argv, "--location", "-l" ) );
-
-        /* building identifier (GEID) */
+        /* building identifier (EGID) */
         char * regbl_building_id( lc_read_string( argc, argv, "--egid", "-g" ) );
 
         /* exportation directory */
         char * regbl_output_path( lc_read_string( argc, argv, "--export", "-e" ) );
 
-        /* building database stream */
-        std::ifstream regbl_building;
-
-        /* building reference stream */
-        std::ifstream regbl_reference;
-
-        /* importation token */
-        std::string regbl_date;
-        std::string regbl_truth;
+        /* path composition */
+        std::string regbl_export_position;
+        std::string regbl_export_detect;
+        std::string regbl_export_reference;
 
         /* importation token */
-        int regbl_detect( -1 );
+        std::string regbl_year;
+        std::string temp;
 
         /* importation token */
-        float regbl_posx( 0 );
-        float regbl_posy( 0 );
+        int regbl_flag( -1 );
+
+        /* importation token */
+        double regbl_posx( 0 );
+        double regbl_posy( 0 );
 
         /* cropping coordinates */
         int regbl_clx( 0 );
@@ -118,211 +195,346 @@
         int regbl_chy( 0 );
 
         /* crop center coordinates */
-        int regbl_cnx( REGBL_TRACKER_CROPHALF );
-        int regbl_cny( REGBL_TRACKER_CROPHALF );
+        int regbl_cnx( 0 );
+        int regbl_cny( 0 );
+
+        /* parsing index */
+        unsigned int regbl_index( 0 );
 
         /* raster matrix */
         cv::Mat regbl_load;
         cv::Mat regbl_crop;
 
         /* combined matrix */
-        cv::Mat regbl_aprc;
-        cv::Mat regbl_aorg;
+        cv::Mat regbl_ftln;
+        cv::Mat regbl_stln;
+        cv::Mat regbl_alin;
         cv::Mat regbl_aref;
 
-        /* check consistency */
-        if ( std::filesystem::is_directory( std::string( regbl_storage_path ) + "/regbl_frame/frame_" + std::string( regbl_location_name ) ) == false ) {
+        /* storage list */
+        lc_list regbl_list;
+
+        /* building database stream */
+        std::ifstream regbl_input;
+        std::ifstream regbl_position;
+        std::ifstream regbl_reference;
+
+        /* check path specification */
+        if ( regbl_storage_path == NULL ) {
 
             /* display message */
-            std::cerr << "error : could not locate the specified location processed maps directory" << std::endl;
+            std::cerr << "error : storage path specification" << std::endl;
 
             /* send message */
             return( 1 );
 
         }
 
-        /* check consistency */
-        if ( std::filesystem::is_directory( std::string( regbl_storage_path ) + "/regbl_frame/frame_" + std::string( regbl_location_name ) + "-original" ) == false ) {
+        /* check path specification */
+        if ( regbl_building_id == NULL ) {
 
             /* display message */
-            std::cerr << "error : could not locate the specified location original maps directory" << std::endl;
+            std::cerr << "error : building EGID specification" << std::endl;
 
             /* send message */
             return( 1 );
+
+        }
+
+        /* check path specification */
+        if ( regbl_output_path == NULL ) {
+
+            /* display message */
+            std::cerr << "error : exportation path specification" << std::endl;
+
+            /* send message */
+            return( 1 );
+
+        }
+
+        /* import storage list */
+        regbl_list = lc_list_import( std::string( regbl_storage_path ) + "/regbl_list" );
+
+        /* check storage list */
+        if ( regbl_list.size() == 0 ) {
+
+            /* display message */
+            std::cerr << "error : unable to import storage list file" << std::endl;
+
+            /* send message */
+            return( 1 );
+
+        }
+
+        /* compose path */
+        regbl_export_position = std::string( regbl_storage_path ) + "/regbl_output/output_position";
+
+        /* check consistency */
+        if ( std::filesystem::is_directory( regbl_export_position ) == false ) {
+
+            /* display message */
+            std::cerr << "error : unable to locate position directory" << std::endl;
+
+            /* send message */
+            return( 1 );
+
+        }
+
+        /* compose path */
+        regbl_export_detect = std::string( regbl_storage_path ) + "/regbl_output/output_detect";
+
+        /* check consistency */
+        if ( std::filesystem::is_directory( regbl_export_detect ) == false ) {
+
+            /* display message */
+            std::cerr << "error : unable to locate detection directory" << std::endl;
+
+            /* send message */
+            return( 1 );
+
+        }
+
+        /* compose path */
+        regbl_export_reference = std::string( regbl_storage_path ) + "/regbl_output/output_reference";
+
+        /* check consistency */
+        if ( std::filesystem::is_directory( regbl_export_reference ) == false ) {
+
+            /* display message */
+            std::cerr << "error : unable to locate detection directory" << std::endl;
+
+            /* send message */
+            return( 1 );
+
+        }
+
+        /* create input stream */
+        regbl_input.open( regbl_export_detect + "/" + std::string( regbl_building_id ), std::ifstream::in );
+
+        /* check input stream */
+        if ( regbl_input.is_open() == false ) {
+
+            /* display message */
+            std::cerr << "error : unable to locate building deduction file" << std::endl;
+
+            /* send message */
+            return( 1 );
+
+        }
+
+        /* input stream parsing */
+        while ( regbl_input >> regbl_year >> regbl_flag >> temp >> temp ) {
+
+            /* create position stream */
+            regbl_position.open( regbl_export_position + "/" + regbl_year + "/" + std::string( regbl_building_id ), std::ifstream::in );
+
+            /* check position stream */
+            if ( regbl_position.is_open() == false ) {
+
+                /* display message */
+                std::cerr << "error : unable to access building position file" << std::endl;
+
+                /* send message */
+                return( 1 );
+
+            }
+
+            /* import position */
+            if ( regbl_position >> regbl_posx >> regbl_posy ) {
+
+                /* invert y coordinate */
+                regbl_posy = std::stod( regbl_list[regbl_index][6] ) - regbl_posy - 1;
+
+                /* compose cropping coordinates */
+                regbl_clx = std::round( regbl_posx ) - REGBL_TRACKER_CROPHALF;
+                regbl_chx = std::round( regbl_posx ) + REGBL_TRACKER_CROPHALF;
+                regbl_cly = std::round( regbl_posy ) - REGBL_TRACKER_CROPHALF;
+                regbl_chy = std::round( regbl_posy ) + REGBL_TRACKER_CROPHALF;
+
+                /* assume center position */
+                regbl_cnx = REGBL_TRACKER_CROPHALF;
+                regbl_cny = REGBL_TRACKER_CROPHALF;
+
+                /* edge detection */
+                if ( regbl_clx < 0 ) {
+
+                    /* update center position */
+                    regbl_cnx += regbl_clx;
+
+                    /* update crop coordinate */
+                    regbl_clx = 0;
+
+                }
+
+                /* edge detection */
+                if ( regbl_cly < 0 ) {
+
+                    /* update center position */
+                    regbl_cny += regbl_cly;
+
+                    /* update crop coordinate */
+                    regbl_cly = 0;
+
+                }
+
+                /* edge detection */
+                if ( regbl_chx > std::stod( regbl_list[regbl_index][5] ) ) {
+
+                    /* update crop coordinates */
+                    regbl_chx = std::stod( regbl_list[regbl_index][5] );
+
+                }
+
+                /* edge detection */
+                if ( regbl_chy > std::stod( regbl_list[regbl_index][6] ) ) {
+
+                    /* update crop coordinates */
+                    regbl_chy = std::stod( regbl_list[regbl_index][6] );
+
+                }
+                
+                /* import original map */
+                regbl_load = cv::imread( std::string( regbl_storage_path ) + "/regbl_frame/frame_original/" + regbl_year + ".tif", cv::IMREAD_COLOR );
+
+                /* check importation */
+                if ( regbl_load.empty() == true ) {
+
+                    /* display message */
+                    std::cerr << "error : unable to import original map" << std::endl;
+
+                    /* send message */
+                    return( 1 );
+
+                }
+
+                /* crop original map */
+                regbl_crop = regbl_load( cv::Rect( regbl_clx, regbl_cly, regbl_chx - regbl_clx, regbl_chy - regbl_cly ) );
+
+                /* process crop */
+                regbl_tracker_crop( regbl_crop, regbl_cnx, regbl_cny, regbl_flag );
+
+                /* draw building and entries */
+                regbl_tracker_building( regbl_crop, regbl_cnx, regbl_cny, regbl_position, regbl_flag );
+
+                /* check accumulator state */
+                if ( regbl_ftln.empty() == true ) {
+
+                    /* bootstrap accumulator */
+                    regbl_ftln = regbl_crop;
+
+                } else {
+
+                    /* update accumulator */
+                    cv::hconcat( regbl_crop, regbl_ftln, regbl_ftln );
+
+                }
+
+                /* import segmented map */
+                regbl_load = cv::imread( std::string( regbl_storage_path ) + "/regbl_frame/frame/" + regbl_year + ".tif", cv::IMREAD_COLOR );
+
+                /* check importation */
+                if ( regbl_load.empty() == true ) {
+
+                    /* display message */
+                    std::cerr << "error : unable to import segmented map" << std::endl;
+
+                    /* send message */
+                    return( 1 );
+
+                }
+
+                /* crop segmented map */
+                regbl_crop = regbl_load( cv::Rect( regbl_clx, regbl_cly, regbl_chx - regbl_clx, regbl_chy - regbl_cly ) );
+
+                /* process crop */
+                regbl_tracker_crop( regbl_crop, regbl_cnx, regbl_cny, regbl_flag );
+
+                /* draw building and entries */
+                regbl_tracker_building( regbl_crop, regbl_cnx, regbl_cny, regbl_position, regbl_flag );
+
+                /* check accumulator state */
+                if ( regbl_stln.empty() == true ) {
+
+                    /* bootstrap accumulator */
+                    regbl_stln = regbl_crop;
+
+                } else {
+
+                    /* update accumulator */
+                    cv::hconcat( regbl_crop, regbl_stln, regbl_stln );
+
+                }
+
+                /* create timeline */
+                regbl_crop = regbl_tracker_timeline( regbl_crop.cols, regbl_year, regbl_flag );
+
+                /* check accumulator state */
+                if ( regbl_alin.empty() == true ) {
+
+                    /* bootstrap accumulator */
+                    regbl_alin = regbl_crop;
+
+                } else {
+
+                    /* update accumulator */
+                    cv::hconcat( regbl_crop, regbl_alin, regbl_alin );
+
+                }
+
+            } else {
+
+                /* display message */
+                std::cerr << "error : unable to import building position from file" << std::endl;
+
+                /* send message */
+                return( 1 );
+
+            }
+
+            /* close position stream */
+            regbl_position.close();
+
+            /* update index */
+            regbl_index ++;
 
         }
 
         /* create reference stream */
-        regbl_reference.open( std::string( regbl_storage_path ) + "/regbl_output/output_reference/reference_" + std::string( regbl_location_name ) + "/" + regbl_building_id, std::ios::in ); 
+        regbl_reference.open( regbl_export_reference + "/" + std::string( regbl_building_id ), std::ifstream::in );
 
         /* check reference stream */
         if ( regbl_reference.is_open() == false ) {
 
-            /* display message */
-            std::cerr << "error : unable to access the building reference file in output directory" << std::endl;
+            /* compose reference bar */
+            regbl_aref = regbl_tracker_reference( regbl_ftln.cols, std::string( regbl_building_id ), std::string( "MISSING" ) );
 
-            /* send message */
-            return( 1 );
+        } else {
 
-        }
+            /* import reference date */
+            regbl_reference >> regbl_year;
 
-        /* import reference construction date */
-        regbl_reference >> regbl_truth;
+            /* compose reference bar */
+            regbl_aref = regbl_tracker_reference( regbl_ftln.cols, std::string( regbl_building_id ), regbl_year );
 
-        /* delete reference stream */
-        regbl_reference.close();
-
-        /* create building stream */
-        regbl_building.open( std::string( regbl_storage_path ) + "/regbl_output/output_database/database_" + std::string( regbl_location_name ) + "/" + regbl_building_id, std::ios::in );
-
-        /* check building stream */
-        if ( regbl_building.is_open() == false ) {
-
-            /* display message */
-            std::cerr << "error : unable to access the building database file in output directory" << std::endl;
-
-            /* send message */
-            return( 1 );
+            /* delete reference stream */
+            regbl_reference.close();
 
         }
-
-        /* parsing building detection database */
-        while ( regbl_building >> regbl_date >> regbl_detect >> regbl_posx >> regbl_posy ) {
-
-            /* import map */
-            regbl_load = cv::imread( std::string( regbl_storage_path ) + "/regbl_frame/frame_" + std::string( regbl_location_name ) + "/" + std::string( regbl_location_name ) + "_" + regbl_date + ".tif", cv::IMREAD_COLOR );
-
-            /* check image importation */
-            if ( regbl_load.empty() == true ) {
-
-                /* display message */
-                std::cerr << "error : unable to load processed map : " << regbl_date << std::endl;
-
-                /* send message */
-                return( 1 );
-
-            }
-
-            /* invert y coordinate */
-            regbl_posy = regbl_load.rows - regbl_posy - 1;
-
-            /* compose cropping coordinates */
-            regbl_clx = std::round( regbl_posx ) - REGBL_TRACKER_CROPHALF;
-            regbl_chx = std::round( regbl_posx ) + REGBL_TRACKER_CROPHALF;
-            regbl_cly = std::round( regbl_posy ) - REGBL_TRACKER_CROPHALF;
-            regbl_chy = std::round( regbl_posy ) + REGBL_TRACKER_CROPHALF;
-
-            /* assume center position */
-            regbl_cnx = REGBL_TRACKER_CROPHALF;
-            regbl_cny = REGBL_TRACKER_CROPHALF;
-
-            /* edge detection */
-            if ( regbl_clx < 0 ) {
-
-                /* update center position */
-                regbl_cnx += regbl_clx;
-
-                /* update crop coordinate */
-                regbl_clx = 0;
-
-            }
-
-            /* edge detection */
-            if ( regbl_cly < 0 ) {
-
-                /* update center position */
-                regbl_cny += regbl_cly;
-
-                /* update crop coordinate */
-                regbl_cly = 0;
-
-            }
-
-            /* edge detection */
-            if ( regbl_chx > regbl_load.cols ) {
-
-                /* update crop coordinates */
-                regbl_chx = regbl_load.cols;
-
-            }
-
-            /* edge detection */
-            if ( regbl_chy > regbl_load.rows ) {
-
-                /* update crop coordinates */
-                regbl_chy = regbl_load.rows;
-
-            }
-
-            /* crop map */
-            regbl_crop = regbl_load( cv::Rect( regbl_clx, regbl_cly, regbl_chx - regbl_clx, regbl_chy - regbl_cly ) );
-
-            /* process crop */
-            regbl_tracker_crop( regbl_crop, regbl_cnx, regbl_cny, regbl_date, regbl_detect );
-
-            /* check accumulator state */
-            if ( regbl_aprc.empty() == true ) {
-
-                /* bootstrap accumulator */
-                regbl_aprc = regbl_crop;
-
-            } else {
-
-                /* update accumulator */
-                cv::hconcat( regbl_crop, regbl_aprc, regbl_aprc );
-
-            }
-
-            /* import map */
-            regbl_load = cv::imread( std::string( regbl_storage_path ) + "/regbl_frame/frame_" + std::string( regbl_location_name ) + "-original/" + std::string( regbl_location_name ) + "_" + regbl_date + ".tif", cv::IMREAD_COLOR );
-
-            /* check image importation */
-            if ( regbl_load.empty() == true ) {
-
-                /* display message */
-                std::cerr << "error : unable to load original map : " << regbl_date << std::endl;
-
-                /* send message */
-                return( 1 );
-
-            }
-
-            /* crop map */
-            regbl_crop = regbl_load( cv::Rect( regbl_clx, regbl_cly, regbl_chx - regbl_clx, regbl_chy - regbl_cly ) );
-
-            /* process crop */
-            regbl_tracker_crop( regbl_crop, regbl_cnx, regbl_cny, regbl_date, regbl_detect );
-
-            /* check accumulator state */
-            if ( regbl_aorg.empty() == true ) {
-
-                /* bootstrap accumulator */
-                regbl_aorg = regbl_crop;
-
-            } else {
-
-                /* update accumulator */
-                cv::hconcat( regbl_crop, regbl_aorg, regbl_aorg );
-
-            }
-
-        }
-
-        /* compose reference bar */
-        regbl_aref = regbl_tracker_reference( regbl_aprc.cols, std::string( regbl_building_id ), regbl_truth );
 
         /* compose single representation */
-        cv::vconcat( regbl_aprc, regbl_aorg, regbl_aprc );
-        cv::vconcat( regbl_aprc, regbl_aref, regbl_aprc );
+        cv::vconcat( regbl_ftln, regbl_alin, regbl_ftln );
+        cv::vconcat( regbl_ftln, regbl_stln, regbl_ftln );
+        cv::vconcat( regbl_ftln, regbl_aref, regbl_ftln );
 
         /* export result */
-        cv::imwrite( std::string( regbl_output_path ) + "/" + std::string( regbl_building_id ) + ".jpg", regbl_aprc );
+        cv::imwrite( std::string( regbl_output_path ) + "/" + std::string( regbl_building_id ) + ".jpg", regbl_ftln );
 
-        /* delete building stream */
-        regbl_building.close();
+        /* delete input stream */
+        regbl_input.close();
 
         /* send message */
         return( 0 );
 
     }
+
 

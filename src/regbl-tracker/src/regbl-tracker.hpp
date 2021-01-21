@@ -87,11 +87,19 @@
 
     /*! ... */
 
-    void regbl_tracker_crop( cv::Mat & regbl_crop, int const regbl_cnx, int const regbl_cny, std::string & regbl_date, int const regbl_detect );
+    void regbl_tracker_crop( cv::Mat & regbl_crop, int const regbl_cnx, int const regbl_cny, int const regbl_detect );
 
     /*! ... */
 
-    cv::Mat regbl_tracker_reference( int const regbl_width, std::string regbl_geid, std::string & regbl_truth );
+    void regbl_tracker_building( cv::Mat & regbl_crop, int const regbl_cnx, int const regbl_cny, std::ifstream & regbl_stream, int const regbl_detect );
+
+    /*! ... */
+
+    cv::Mat regbl_tracker_timeline( int const regbl_width, std::string regbl_year, int const regbl_detect );
+
+    /*! ... */
+
+    cv::Mat regbl_tracker_reference( int const regbl_width, std::string regbl_geid, std::string regbl_year );
 
     /*! \brief Main function
      *
