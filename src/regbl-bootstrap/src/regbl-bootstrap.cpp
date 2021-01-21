@@ -146,7 +146,7 @@
                 regbl_v = ( ( regbl_y - std::stod( regbl_list[regbl_parse][3], nullptr ) ) / ( std::stod( regbl_list[regbl_parse][4], nullptr ) - std::stod( regbl_list[regbl_parse][3], nullptr ) ) ) * std::stod( regbl_list[regbl_parse][6], nullptr );
 
                 /* check coordinates */
-                if ( ( regbl_u >= 0. ) && ( regbl_u < std::stod( regbl_list[regbl_parse][5], nullptr ) ) && ( regbl_v >= 0. ) && ( regbl_u < std::stod( regbl_list[regbl_parse][6], nullptr ) ) ) {
+                if ( ( regbl_u >= 0. ) && ( regbl_u < std::stod( regbl_list[regbl_parse][5], nullptr ) ) && ( regbl_v >= 0. ) && ( regbl_v < std::stod( regbl_list[regbl_parse][6], nullptr ) ) ) {
 
                     /* add matrix rows */
                     regbl_transfer.push_back( std::vector < double > (2) );
@@ -362,7 +362,7 @@
                             regbl_v = ( ( regbl_y - std::stod( regbl_list[regbl_parse][3], nullptr ) ) / ( std::stod( regbl_list[regbl_parse][4], nullptr ) - std::stod( regbl_list[regbl_parse][3], nullptr ) ) ) * std::stod( regbl_list[regbl_parse][6], nullptr );
 
                             /* check coordinates */
-                            if ( ( regbl_u >= 0. ) && ( regbl_u < std::stod( regbl_list[regbl_parse][5], nullptr ) ) && ( regbl_v >= 0. ) && ( regbl_u < std::stod( regbl_list[regbl_parse][6], nullptr ) ) ) {
+                            if ( ( regbl_u >= 0. ) && ( regbl_u < std::stod( regbl_list[regbl_parse][5], nullptr ) ) && ( regbl_v >= 0. ) && ( regbl_v < std::stod( regbl_list[regbl_parse][6], nullptr ) ) ) {
 
                                 /* add matrix rows */
                                 regbl_transfer.push_back( std::vector < double > (2) );

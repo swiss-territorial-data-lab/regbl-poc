@@ -27,6 +27,23 @@
 
     bool regbl_detect_on_map( cv::Mat & regbl_map, double const regbl_x, double const regbl_y, double const regbl_size ) {
 
+        /* single point detection */
+        if ( regbl_map.at<uchar>( regbl_y, regbl_x ) < 255 ) {
+
+            /* send results */
+            return( true );
+
+        } else {
+
+            /* send results */
+            return( false );
+
+        }
+
+    }
+
+    bool regbl_detect_on_map_( cv::Mat & regbl_map, double const regbl_x, double const regbl_y, double const regbl_size ) {
+
         /* detection cross pattern */
         static const int regbl_cross[5][2] = {
 
@@ -91,6 +108,16 @@
         double regbl_x( 0. );
         double regbl_y( 0. );
 
+        /* cross size */
+        int regbl_cross( 0 );
+
+        /* detection statistic */
+        int regbl_detect( 0 );
+        int regbl_total ( 0 );
+
+        /* cross color */
+        cv::Scalar regbl_color;
+
         /* parsing egid directory */
         for ( const std::filesystem::directory_entry & regbl_file : std::filesystem::directory_iterator( regbl_export_egid ) ) {
 
@@ -113,9 +140,55 @@
                     exit( 1 );
 
                 }
-                
-                /* import coordinates */
-                if ( regbl_input >> regbl_x >> regbl_y ) {
+
+                /* reset statistic */
+                regbl_detect = 0;
+                regbl_total = 0;
+
+                /* reset cross size */
+                regbl_cross = 3;
+
+                /* parsing position */
+                while ( regbl_input >> regbl_x >> regbl_y ) {
+
+                    /* detection on map */
+                    if ( regbl_detect_on_map( regbl_map, regbl_x, regbl_y, 3 ) == true ) {
+
+                        /* update statistic */
+                        regbl_detect ++;
+
+                        /* update color */
+                        regbl_color = cv::Scalar( 0, 255, 0, 255 );
+
+                    } else {
+
+                        /* update color */
+                        regbl_color = cv::Scalar( 0, 0, 255, 255 );
+
+                    }
+
+                    /* mark detection on tacking map */
+                    cv::line( regbl_track, cv::Point( regbl_x    , regbl_y - regbl_cross ), cv::Point( regbl_x    , regbl_y + regbl_cross ), regbl_color );
+                    cv::line( regbl_track, cv::Point( regbl_x - regbl_cross, regbl_y     ), cv::Point( regbl_x + regbl_cross, regbl_y     ), regbl_color );
+
+                    /* update total */
+                    regbl_total ++;
+
+                    /* update cross size */
+                    regbl_cross = 1;
+
+                }
+
+                /* check total consistency */
+                if ( regbl_total == 0 ) {
+
+                    /* display message */
+                    std::cerr << "error : unable to import position from file with EGID " << regbl_egid << std::endl;
+
+                    /* send message */
+                    exit( 1 );
+
+                } else {
 
                     /* create output stream */
                     regbl_output.open( regbl_export_detect + "/" + regbl_egid, std::ofstream::app );
@@ -131,37 +204,11 @@
 
                     }
 
-                    /* detect on map */
-                    if ( regbl_detect_on_map( regbl_map, regbl_x, regbl_y, 3 ) == true ) {
-
-                        /* export detection result */
-                        regbl_output << regbl_year << " 1 " << regbl_x << " " << regbl_y << std::endl;
-
-                        /* update traking map */
-                        cv::line( regbl_track, cv::Point( regbl_x    , regbl_y - 3 ), cv::Point( regbl_x    , regbl_y + 3 ), cv::Scalar( 0, 255, 0, 255 ) );
-                        cv::line( regbl_track, cv::Point( regbl_x - 3, regbl_y     ), cv::Point( regbl_x + 3, regbl_y     ), cv::Scalar( 0, 255, 0, 255 ) );
-
-                    } else {
-
-                        /* export detection result */
-                        regbl_output << regbl_year << " 0 " << regbl_x << " " << regbl_y <<  std::endl;
-
-                        /* update traking map */
-                        cv::line( regbl_track, cv::Point( regbl_x    , regbl_y - 3 ), cv::Point( regbl_x    , regbl_y + 3 ), cv::Scalar( 0, 0, 255, 255 ) );
-                        cv::line( regbl_track, cv::Point( regbl_x - 3, regbl_y     ), cv::Point( regbl_x + 3, regbl_y     ), cv::Scalar( 0, 0, 255, 255 ) );
-
-                    }
+                    /* export detection result */
+                    regbl_output << regbl_year << ( ( regbl_detect > 0 ) ? " 1" : " 0" ) << std::endl;
 
                     /* delete output stream */
                     regbl_output.close();
-
-                } else {
-
-                    /* display message */
-                    std::cerr << "error : unable to import position from file with EGID " << regbl_egid << std::endl;
-
-                    /* send message */
-                    exit( 1 );
 
                 }
 
