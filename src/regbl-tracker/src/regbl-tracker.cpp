@@ -208,7 +208,7 @@
         cv::Mat regbl_return( 18, regbl_width, CV_8UC3, regbl_color );
 
         /* display reference text */
-        cv::putText( regbl_return, regbl_geid + " " + regbl_ldeduce + ", " + regbl_udeduce + " " + regbl_year, cv::Point( 0, 14 ), cv::FONT_HERSHEY_PLAIN, 1, cv::Scalar( 255, 255, 255 ) );
+        cv::putText( regbl_return, regbl_geid + " " + regbl_ldeduce + "-" + regbl_udeduce + " " + regbl_year, cv::Point( 0, 14 ), cv::FONT_HERSHEY_PLAIN, 1, cv::Scalar( 255, 255, 255 ) );
 
         /* return matrix */
         return( regbl_return );
