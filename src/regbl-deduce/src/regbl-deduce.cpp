@@ -61,6 +61,20 @@
 
         }
 
+        /* create output stream */
+        regbl_output.open( regbl_deduce, std::ofstream::out );
+
+        /* check consistency */
+        if ( regbl_output.is_open() == false ) {
+
+            /* display message */
+            std::cerr << "error : unable to write in storage structure : deduction file" << std::endl;
+
+            /* send message */
+            exit( 1 );
+
+        }
+
         /* parsing file */
         while ( regbl_flag ) {
 
@@ -70,25 +84,8 @@
                 /* check flag state */
                 if ( regbl_state == "0" ) {
 
-                    /* create output stream */
-                    regbl_output.open( regbl_deduce, std::ofstream::out );
-
-                    /* check consistency */
-                    if ( regbl_output.is_open() == false ) {
-
-                        /* display message */
-                        std::cerr << "error : unable to write deduction file" << std::endl;
-
-                        /* send message */
-                        exit( 1 );
-
-                    }
-
                     /* export detected building date range boundary */
                     regbl_output << regbl_memory << " " << regbl_date;
-
-                    /* delete output stream */
-                    regbl_output.close();
 
                     /* update detection state */
                     regbl_detected = true;
@@ -113,27 +110,13 @@
         /* check detection state */
         if ( regbl_detected == false ) {
 
-            /* create output stream */
-            regbl_output.open( regbl_deduce, std::ofstream::out );
-
-            /* check consistency */
-            if ( regbl_output.is_open() == false ) {
-
-                /* display message */
-                std::cerr << "error : unable to write deduction file" << std::endl;
-
-                /* send message */
-                exit( 1 );
-
-            }
-
             /* export detected building date range boundary */
             regbl_output << regbl_memory << " -32768";
 
-            /* delete output stream */
-            regbl_output.close();
-
         }
+
+        /* delete output stream */
+        regbl_output.close();
 
         /* delete stream */
         regbl_input.close();
@@ -149,7 +132,7 @@
         /* storage structure path */
         char * regbl_storage_path( lc_read_string( argc, argv, "--storage", "-s" ) );
 
-        /* egid */
+        /* egid value */
         std::string regbl_egid;
 
         /* path composition */

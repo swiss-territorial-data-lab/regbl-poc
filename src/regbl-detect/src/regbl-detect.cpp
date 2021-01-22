@@ -25,23 +25,6 @@
     source - Detection methods
  */
 
-    bool regbl_detect_on_map_( cv::Mat & regbl_map, double const regbl_x, double const regbl_y, double const regbl_size ) {
-
-        /* single point detection */
-        if ( regbl_map.at<uchar>( regbl_y, regbl_x ) < 255 ) {
-
-            /* send results */
-            return( true );
-
-        } else {
-
-            /* send results */
-            return( false );
-
-        }
-
-    }
-
     bool regbl_detect_on_map( cv::Mat & regbl_map, double const regbl_x, double const regbl_y, double const regbl_size ) {
 
         /* detection cross pattern */
@@ -101,7 +84,7 @@
         /* output stream */
         std::ofstream regbl_output;
 
-        /* egid */
+        /* egid value */
         std::string regbl_egid;
 
         /* position coordinates */
@@ -134,7 +117,7 @@
                 if ( regbl_input.is_open() == false ) {
 
                     /* display message */
-                    std::cerr << "error : unable to access position file for EGID " << regbl_egid << std::endl;
+                    std::cerr << "error : unable to access position file" << std::endl;
 
                     /* send message */
                     exit( 1 );
@@ -183,7 +166,7 @@
                 if ( regbl_total == 0 ) {
 
                     /* display message */
-                    std::cerr << "error : unable to import position from file with EGID " << regbl_egid << std::endl;
+                    std::cerr << "error : unable to import position from position file" << std::endl;
 
                     /* send message */
                     exit( 1 );
@@ -197,7 +180,7 @@
                     if ( regbl_output.is_open() == false ) {
 
                         /* display message */
-                        std::cerr << "error : unable to access detection directory for writting detection file with EGID " << regbl_egid << std::endl;
+                        std::cerr << "error : unable to write in storage structure : detection file " << std::endl;
 
                         /* send message */
                         exit( 1 );
@@ -315,7 +298,6 @@
 
         }
 
-
         /* compose path */
         regbl_export_frame = std::string( regbl_storage_path ) + "/regbl_output/output_frame";
 
@@ -359,7 +341,7 @@
                 if ( ( std::stoi( regbl_list[regbl_parse][5] ) != regbl_map.cols ) || ( std::stoi( regbl_list[regbl_parse][6] ) != regbl_map.rows ) ) {
 
                     /* display message */
-                    std::cerr << "error : maps size inconsistent with storage list" << std::endl;
+                    std::cerr << "error : inconsistency between map size and storage list size" << std::endl;
 
                     /* send message */
                     return( 1 );

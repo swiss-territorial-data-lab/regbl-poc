@@ -164,7 +164,7 @@
                 /* check coordinates */
                 if ( ( regbl_u >= 0. ) && ( regbl_u < std::stod( regbl_list[regbl_parse][5], nullptr ) ) && ( regbl_v >= 0. ) && ( regbl_v < std::stod( regbl_list[regbl_parse][6], nullptr ) ) ) {
 
-                    /* add matrix rows */
+                    /* add matrix row */
                     regbl_transfer.push_back( std::vector < double > (2) );
 
                     /* push coordinates */
@@ -182,7 +182,7 @@
                 if ( regbl_transfer.size() > 0 ) {
 
                     /* display warning */
-                    std::cerr << "warning : rejected building (" << regbl_token << ") as partially appearing on maps timeline" << std::endl;
+                    std::cerr << "warning : rejected building (" << regbl_token << ") as partially appearing on spatio-temporal raster" << std::endl;
 
                 }
 
@@ -650,6 +650,14 @@
             /* create directory */
             std::filesystem::create_directories( regbl_export_egid );
 
+        } else {
+
+            /* display message */
+            std::cerr << "error : egid directory already processed" << std::endl;
+
+            /* send message */
+            return( 1 );
+
         }
 
         /* compose path */
@@ -666,7 +674,15 @@
 
             }
 
-        }  
+        } else {
+
+            /* display message */
+            std::cerr << "error : position directory already processed" << std::endl;
+
+            /* send message */
+            return( 1 );
+
+        }
 
         /* compose path */
         regbl_export_reference = std::string( regbl_storage_path ) + "/regbl_output/output_reference";
@@ -676,6 +692,14 @@
 
             /* create directory */
             std::filesystem::create_directories( regbl_export_reference );
+
+        } else {
+
+            /* display message */
+            std::cerr << "error : reference directory already processed" << std::endl;
+
+            /* send message */
+            return( 1 );
 
         }
 
@@ -688,7 +712,15 @@
             /* create directory */
             std::filesystem::create_directories( regbl_export_surface );
 
-        }  
+        } else {
+
+            /* display message */
+            std::cerr << "error : surface directory already processed" << std::endl;
+
+            /* send message */
+            return( 1 );
+
+        }
 
         /* create main extraction - position, egid, reference */
         regbl_bootstrap_extract( regbl_GEB_path, regbl_export_egid, regbl_export_position, regbl_export_reference, regbl_export_surface, regbl_list );
