@@ -89,7 +89,7 @@
 
     /*! ... */
 
-    void regbl_bootstrap_extract( std::string regbl_GEB_path, std::string regbl_export_egid, std::string regbl_export_position, std::string regbl_export_reference, lc_list & regbl_list );
+    void regbl_bootstrap_extract( std::string regbl_GEB_path, std::string regbl_export_egid, std::string regbl_export_position, std::string regbl_export_reference, std::string regbl_export_surface, lc_list & regbl_list );
 
     /*! ... */
 

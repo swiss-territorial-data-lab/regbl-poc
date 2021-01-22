@@ -65,7 +65,7 @@
         while ( regbl_flag ) {
 
             /* import token */
-            if ( regbl_input >> regbl_date >> regbl_state >> regbl_void >> regbl_void ) {
+            if ( regbl_input >> regbl_date >> regbl_state ) {
 
                 /* check flag state */
                 if ( regbl_state == "0" ) {

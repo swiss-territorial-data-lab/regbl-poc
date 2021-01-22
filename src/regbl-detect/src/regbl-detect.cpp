@@ -25,7 +25,7 @@
     source - Detection methods
  */
 
-    bool regbl_detect_on_map( cv::Mat & regbl_map, double const regbl_x, double const regbl_y, double const regbl_size ) {
+    bool regbl_detect_on_map_( cv::Mat & regbl_map, double const regbl_x, double const regbl_y, double const regbl_size ) {
 
         /* single point detection */
         if ( regbl_map.at<uchar>( regbl_y, regbl_x ) < 255 ) {
@@ -42,7 +42,7 @@
 
     }
 
-    bool regbl_detect_on_map_( cv::Mat & regbl_map, double const regbl_x, double const regbl_y, double const regbl_size ) {
+    bool regbl_detect_on_map( cv::Mat & regbl_map, double const regbl_x, double const regbl_y, double const regbl_size ) {
 
         /* detection cross pattern */
         static const int regbl_cross[5][2] = {
@@ -149,7 +149,7 @@
                 regbl_cross = 3;
 
                 /* parsing position */
-                while ( regbl_input >> regbl_x >> regbl_y ) {
+                if ( regbl_input >> regbl_x >> regbl_y ) {
 
                     /* detection on map */
                     if ( regbl_detect_on_map( regbl_map, regbl_x, regbl_y, 3 ) == true ) {

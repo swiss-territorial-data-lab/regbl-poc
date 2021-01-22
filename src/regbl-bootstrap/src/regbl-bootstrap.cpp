@@ -25,7 +25,7 @@
     source - Extraction function
  */
 
-    void regbl_bootstrap_extract( std::string regbl_GEB_path, std::string regbl_export_egid, std::string regbl_export_position, std::string regbl_export_reference, lc_list & regbl_list ) {
+    void regbl_bootstrap_extract( std::string regbl_GEB_path, std::string regbl_export_egid, std::string regbl_export_position, std::string regbl_export_reference, std::string regbl_export_surface, lc_list & regbl_list ) {
 
         /* reading buffers */
         char regbl_head[REGBL_BUFFER] = { 0 };
@@ -34,12 +34,14 @@
         /* reading token */
         char regbl_token[REGBL_BUFFER] = { 0 };
         char regbl_rdate[REGBL_BUFFER] = { 0 };
+        char regbl_rarea[REGBL_BUFFER] = { 0 };
 
         /* detection index */
         int regbl_EGID ( 0 );
         int regbl_GKODE( 0 );
         int regbl_GKODN( 0 );
         int regbl_GBAUJ( 0 );
+        int regbl_GAREA( 0 );
 
         /* coordinates variable */
         double regbl_x( 0. );
@@ -114,6 +116,17 @@
 
         }
 
+        /* detect and check entry */
+        if ( ( regbl_GAREA = regbl_detect_database_header( regbl_head, "GAREA" ) ) < 0 ) {
+
+            /* display message */
+            std::cerr << "error : unable to locate GAREA in GEB database" << std::endl;
+
+            /* abort */
+            exit( 1 );
+
+        }
+
         /* parsing database entries */
         while ( regbl_stream.getline( regbl_line, REGBL_BUFFER ) ) {
 
@@ -134,6 +147,9 @@
 
             /* read reference date */
             regbl_detect_database_entry( regbl_line, regbl_GBAUJ, regbl_rdate );
+
+            /* read reference area */
+            regbl_detect_database_entry( regbl_line, regbl_GAREA, regbl_rarea );
 
             /* reset transfer matrix */
             regbl_transfer.clear();
@@ -238,6 +254,26 @@
                     regbl_output.close();
 
                 }
+
+                /* create surface stream */
+                regbl_output.open( regbl_export_surface + "/" + regbl_token, std::ofstream::out );
+
+                /* check surface stream */
+                if ( regbl_output.is_open() == false ) {
+
+                    /* display message */
+                    std::cerr << "error : unable to write in storage structure : surface file" << std::endl;
+
+                    /* send message */
+                    exit( 1 );                    
+
+                }
+
+                /* export surface value */
+                regbl_output << regbl_rarea << std::endl;
+
+                /* delete surface stream */
+                regbl_output.close();
 
             }
 
@@ -550,9 +586,10 @@
         char * regbl_EIN_path( lc_read_string( argc, argv, "--ein", "-e" ) );
 
         /* path composition */
-        std::string regbl_export_reference;
         std::string regbl_export_egid;
         std::string regbl_export_position;
+        std::string regbl_export_surface;
+        std::string regbl_export_reference;
 
         /* storage list */
         lc_list regbl_list;
@@ -640,10 +677,21 @@
             /* create directory */
             std::filesystem::create_directories( regbl_export_reference );
 
-        }      
+        }
+
+        /* compose path */
+        regbl_export_surface = std::string( regbl_storage_path ) + "/regbl_output/output_surface";
+
+        /* check directory */
+        if ( std::filesystem::is_directory( regbl_export_surface ) == false ) {
+
+            /* create directory */
+            std::filesystem::create_directories( regbl_export_surface );
+
+        }  
 
         /* create main extraction - position, egid, reference */
-        regbl_bootstrap_extract( regbl_GEB_path, regbl_export_egid, regbl_export_position, regbl_export_reference, regbl_list );
+        regbl_bootstrap_extract( regbl_GEB_path, regbl_export_egid, regbl_export_position, regbl_export_reference, regbl_export_surface, regbl_list );
 
         /* create secondary extraction - entries position */
         regbl_bootstrap_entries( regbl_EIN_path, regbl_export_egid, regbl_export_position, regbl_list );
