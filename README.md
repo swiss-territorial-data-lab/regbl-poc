@@ -1,18 +1,30 @@
 ## Overview
 
-_Currently under development_
+This repository is related to the _RegBL completion_ research project. The _STDL_ was contacted by the Swiss Federal Statistical Office (_OFS_) to determine in which extend it could be possible to complete the construction date of Swiss buildings based on the analysis of a temporal sequence of the Swiss federal maps produced by _swisstopo_. With an initial target of _80%_ of correct guesses, the goal of this research project was to demonstrate the possibility to reach such goal using a reliable validation metric.
 
-The _regbl-poc_ is a proof-of-concept for the detection of the construction dates
- of the swiss buildings contained in the [_OFS_](https://www.bfs.admin.ch/bfs/fr/home.html) official [RegBL](https://www.housing-stat.ch/fr/accueil.html) database.
+This repository holds the developed scripts used to analyse the results of the detection made through the research project primary processing pipeline.
+
+## Research Project Links
+
+The following links give access to the codes related to the project :
+
+* [Primary pipeline - Construction dates extraction using maps](https://github.com/swiss-territorial-data-lab/regbl-poc)
+* [Secondary pipeline - Construction dates extraction without maps](https://github.com/swiss-territorial-data-lab/intYEARpolator)
+* [Results and analysis tools for the primary pipeline (This repository)](https://github.com/swiss-territorial-data-lab/regbl-poc-analysis)
+
+The following links give access to official documentations on the considered data :
+
+* [RegBL : Swiss federal register of buildings and dwellings](https://www.bfs.admin.ch/bfs/en/home/registers/federal-register-buildings-dwellings.html)
+* [Maps : Swiss national maps 1:25'000](https://shop.swisstopo.admin.ch/en/products/maps/national/lk25)
 
 ## regbl-poc
 
 ## Copyright and License
 
-**regbl-poc** - Nils Hamel, Huriel Reichel <br >
-Copyright (c) 2020 Republic and Canton of Geneva
+**regbl-poc** - Nils Hamel, Huriel Richel <br >
+Copyright (c) 2020-2021 Republic and Canton of Geneva
 
-This program is licensed under the terms of the GNU GPLv3. Documentation and illustrations are licensed under the terms of the CC BY-NC-SA.
+This program is licensed under the terms of the GNU GPLv3. Documentation and illustrations are licensed under the terms of the CC BY 4.0.
 
 ## Dependencies
 
