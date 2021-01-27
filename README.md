@@ -2,15 +2,15 @@
 
 This repository is related to the _RegBL completion_ research project. The _STDL_ was contacted by the Swiss Federal Statistical Office (_OFS_) to determine in which extend it could be possible to complete the construction date of Swiss buildings based on the analysis of a temporal sequence of the Swiss federal maps produced by _swisstopo_. With an initial target of _80%_ of correct guesses, the goal of this research project was to demonstrate the possibility to reach such goal using a reliable validation metric.
 
-This repository holds the developed scripts used to analyse the results of the detection made through the research project primary processing pipeline.
+This repository holds the primary pipeline codes used to process the _RegBL_ entries using the _swisstopo_ maps. It also comes with a specific tool used to create temporal representation of the situation of buildings using maps and _RegBL_ information.
 
 ## Research Project Links
 
 The following links give access to the codes related to the project :
 
-* [Primary pipeline - Construction dates extraction using maps](https://github.com/swiss-territorial-data-lab/regbl-poc)
+* [Primary pipeline - Construction dates extraction using maps (This repository)](https://github.com/swiss-territorial-data-lab/regbl-poc)
 * [Secondary pipeline - Construction dates extraction without maps](https://github.com/swiss-territorial-data-lab/intYEARpolator)
-* [Results and analysis tools for the primary pipeline (This repository)](https://github.com/swiss-territorial-data-lab/regbl-poc-analysis)
+* [Results and analysis tools for the primary pipeline](https://github.com/swiss-territorial-data-lab/regbl-poc-analysis)
 
 The following links give access to official documentations on the considered data :
 
