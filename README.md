@@ -19,6 +19,13 @@ The following links give access to official documentations on the considered dat
 
 ## regbl-poc
 
+* [Processing structure bootstrap](src/regbl-bootstrap)
+* [Source map segmentation](src/regbl-segmentation)
+* [Building detection on segmented maps](src/regbl-detect)
+* [Construction date deduction based on detections](src/regbl-deduce)
+
+* [Building timeline composer](src/regbl-tracker)
+
 ## Copyright and License
 
 **regbl-poc** - Nils Hamel, Huriel Richel <br >
