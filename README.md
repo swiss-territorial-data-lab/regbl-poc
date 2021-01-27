@@ -9,7 +9,7 @@ This repository holds the primary pipeline codes used to process the _RegBL_ ent
 The following links give access to the codes related to the project :
 
 * [Primary pipeline - Construction dates extraction using maps (This repository)](https://github.com/swiss-territorial-data-lab/regbl-poc)
-* [Secondary pipeline - Construction dates extraction without maps](https://github.com/swiss-territorial-data-lab/intYEARpolator)
+* [Secondary pipeline - Construction dates extraction without maps](https://github.com/swiss-territorial-data-lab/regbl-poc-intyearpolator)
 * [Results and analysis tools for the primary pipeline](https://github.com/swiss-territorial-data-lab/regbl-poc-analysis)
 
 The following links give access to official documentations on the considered data :
