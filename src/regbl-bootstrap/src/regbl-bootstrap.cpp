@@ -25,7 +25,7 @@
     source - Extraction function
  */
 
-    void regbl_bootstrap_extract( std::string regbl_GEB_path, std::string regbl_export_egid, std::string regbl_export_position, std::string regbl_export_reference, std::string regbl_export_surface, lc_list & regbl_list ) {
+    void regbl_bootstrap_extract( std::string regbl_GEB_path, std::string regbl_export_egid, std::string regbl_export_position, std::string regbl_export_reference, std::string regbl_export_surface, lc_list_t & regbl_list ) {
 
         /* reading buffers */
         char regbl_head[REGBL_BUFFER] = { 0 };
@@ -284,7 +284,7 @@
 
     }
 
-    void regbl_bootstrap_entries( std::string regbl_EIN_path, std::string regbl_export_egid, std::string regbl_export_position, lc_list & regbl_list ) {
+    void regbl_bootstrap_entries( std::string regbl_EIN_path, std::string regbl_export_egid, std::string regbl_export_position, lc_list_t & regbl_list ) {
 
         /* reading buffers */
         char regbl_head[REGBL_BUFFER] = { 0 };
@@ -592,7 +592,7 @@
         std::string regbl_export_reference;
 
         /* storage list */
-        lc_list regbl_list;
+        lc_list_t regbl_list;
 
         /* check path specification */
         if ( regbl_storage_path == NULL ) {

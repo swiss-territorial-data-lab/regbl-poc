@@ -33,18 +33,22 @@
         /* output stream */
         std::ofstream regbl_output;
 
-        /* file tokens */
+        /* input token */
         std::string regbl_date;
         std::string regbl_state;
         std::string regbl_void;
 
+        /* input token */
+        int regbl_size( 0 );
+
         /* memory token */
         std::string regbl_memory( "32767" );
 
-        /* loop state */
-        bool regbl_flag( true );
+        /* memory token */
+        int regbl_push( -1 );
 
-        /* detection state */
+        /* state flags */
+        bool regbl_flag( true );
         bool regbl_detected( false );
 
         /* create input stream */
@@ -76,10 +80,10 @@
         }
 
         /* parsing file */
-        while ( regbl_flag ) {
+        while ( ( regbl_flag == true ) && ( regbl_detected == false ) ) {
 
             /* import token */
-            if ( regbl_input >> regbl_date >> regbl_state ) {
+            if ( regbl_input >> regbl_date >> regbl_state >> regbl_void >> regbl_void >> regbl_size ) {
 
                 /* check flag state */
                 if ( regbl_state == "0" ) {
@@ -90,13 +94,31 @@
                     /* update detection state */
                     regbl_detected = true;
 
-                    /* update loop state */
-                    regbl_flag = false;
+                } else {
+
+                    /* check pushed value */
+                    if ( regbl_push > 0 ) {
+
+                        /* apply morphologic test */
+                        if ( regbl_ratio( regbl_push, regbl_size ) > REGBL_DEDUCE_RATIO ) {
+
+                            /* export detected building date range boundary */
+                            regbl_output << regbl_memory << " " << regbl_date;
+
+                            /* update detection state */
+                            regbl_detected = true;
+
+                        }
+
+                    }
 
                 }
 
                 /* push date */
                 regbl_memory = regbl_date;
+
+                /* push size */
+                regbl_push = regbl_size;
 
             } else {
 

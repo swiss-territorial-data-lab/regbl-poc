@@ -57,10 +57,7 @@
 
     }
 
-    void regbl_tracker_building( cv::Mat & regbl_crop, int const regbl_cnx, int const regbl_cny, std::ifstream & regbl_stream, int const regbl_detect ) {
-
-        /* color value */
-        cv::Scalar regbl_color;
+    void regbl_tracker_building( cv::Mat & regbl_crop, int const regbl_cnx, int const regbl_cny, std::ifstream & regbl_stream ) {
 
         /* importation token */
         double regbl_cx( 0. );
@@ -68,21 +65,8 @@
         double regbl_ux( 0. );
         double regbl_uy( 0. );
 
-        /* check detection result */
-        if ( regbl_detect == 0 ) {
-
-            /* assign color */
-            regbl_color = cv::Scalar( 78, 66, 192 );
-
-        } else {
-
-            /* assign color */
-            regbl_color = cv::Scalar( 98, 142, 22 );
-
-        }
-
         /* display central position */
-        cv::circle( regbl_crop, cv::Point( regbl_cnx, regbl_cny ), 1, regbl_color, cv::FILLED );
+        cv::circle( regbl_crop, cv::Point( regbl_cnx, regbl_cny ), 1, cv::Scalar( 224, 16, 224 ), cv::FILLED );
 
         /* clear stream */
         regbl_stream.clear();
@@ -103,47 +87,50 @@
             regbl_uy = regbl_cny - std::round( regbl_uy );
 
             /* display entires position */
-            cv::circle( regbl_crop, cv::Point( regbl_ux, regbl_uy ), 1, regbl_color, cv::FILLED );
+            cv::circle( regbl_crop, cv::Point( regbl_ux, regbl_uy ), 1, cv::Scalar( 224, 16, 224 ), cv::FILLED );
 
             /* draw linking line */
-            cv::line( regbl_crop, cv::Point( regbl_cnx, regbl_cny ), cv::Point( regbl_ux, regbl_uy ), regbl_color );
+            cv::line( regbl_crop, cv::Point( regbl_cnx, regbl_cny ), cv::Point( regbl_ux, regbl_uy ), cv::Scalar( 224, 16, 224 ) );
 
         }
 
     }
 
-    void regbl_tracker_surface( cv::Mat & regbl_crop, int const regbl_cnx, int const regbl_cny, std::string regbl_surface, double const regbl_factor, int const regbl_detect ) {
-
-        /* color value */
-        cv::Scalar regbl_color; 
+    void regbl_tracker_surface( cv::Mat & regbl_crop, int const regbl_cnx, int const regbl_cny, double const regbl_surface ) {
 
         /* check surface value */
-        if ( regbl_surface.length() == 0 ) {
+        if ( regbl_surface < 0 ) {
 
             /* abort drawing */
             return;
 
         }
 
-        /* check detection result */
-        if ( regbl_detect == 0 ) {
-
-            /* assign color */
-            regbl_color = cv::Scalar( 78, 66, 192 );
-
-        } else {
-
-            /* assign color */
-            regbl_color = cv::Scalar( 98, 142, 22 );
-
-        }
-
         /* display building sythetic surface */
-        cv::circle( regbl_crop, cv::Point( regbl_cnx, regbl_cny ), std::sqrt( std::stod( regbl_surface ) / 3.1415926353 ), regbl_color );
+        cv::circle( regbl_crop, cv::Point( regbl_cnx, regbl_cny ), std::sqrt( regbl_surface / 3.1415926353 ), cv::Scalar( 224, 16, 224 ) );
 
     }
 
-    cv::Mat regbl_tracker_timeline( int const regbl_width, std::string regbl_year, int const regbl_detect ) {
+    void regbl_tracker_detect( cv::Mat & regbl_crop, double const regbl_dx, double const regbl_dy, double const regbl_size, bool const regbl_detect ) {
+
+        /* check detection result */
+        if ( regbl_detect == 0 ) {
+
+            /* abort drawing */
+            return;
+
+        }
+
+        /* display connected area size */
+        cv::circle( regbl_crop, cv::Point( regbl_dx, regbl_dy ), std::sqrt( regbl_size / 3.1415926353 ), cv::Scalar( 98, 142, 22 ) );
+
+        /* display detection cross */
+        cv::line( regbl_crop, cv::Point( regbl_dx, regbl_dy - 3 ), cv::Point( regbl_dx, regbl_dy + 3 ), cv::Scalar( 98, 142, 22 ) );
+        cv::line( regbl_crop, cv::Point( regbl_dx - 3, regbl_dy ), cv::Point( regbl_dx + 3, regbl_dy ), cv::Scalar( 98, 142, 22 ) );
+
+    }
+
+    cv::Mat regbl_tracker_timeline( int const regbl_width, std::string regbl_year, int const regbl_detect, bool const regbl_lbound, bool const regbl_ubound ) {
 
         /* text shift value */
         int regbl_shift( ( regbl_width - ( REGBL_TRACKER_CROPHALF * 2 ) ) / 2 );
@@ -166,6 +153,26 @@
 
         /* returned matrix */
         cv::Mat regbl_return( 18, regbl_width, CV_8UC3, regbl_color );
+
+        /* check bound flag */
+        if ( regbl_ubound == true ) {
+
+            /* display bound */
+            cv::line( regbl_return, cv::Point( 0, 1 ), cv::Point( 0, 16 ), cv::Scalar( 255, 255, 255 ) );
+            cv::line( regbl_return, cv::Point( 0, 8 ), cv::Point( 7,  1 ), cv::Scalar( 255, 255, 255 ) );
+            cv::line( regbl_return, cv::Point( 0, 9 ), cv::Point( 7, 16 ), cv::Scalar( 255, 255, 255 ) );
+
+        }
+
+        /* check bound flag */
+        if ( regbl_lbound == true ) {
+
+            /* display bound */
+            cv::line( regbl_return, cv::Point( regbl_width - 1, 1 ), cv::Point( regbl_width - 1, 16 ), cv::Scalar( 255, 255, 255 ) );
+            cv::line( regbl_return, cv::Point( regbl_width - 1, 8 ), cv::Point( regbl_width - 8,  1 ), cv::Scalar( 255, 255, 255 ) );
+            cv::line( regbl_return, cv::Point( regbl_width - 1, 9 ), cv::Point( regbl_width - 8, 16 ), cv::Scalar( 255, 255, 255 ) );
+
+        }
 
         /* display crop date */
         cv::putText( regbl_return, regbl_year, cv::Point( 40 + regbl_shift, 14 ), cv::FONT_HERSHEY_PLAIN, 1, cv::Scalar( 255, 255, 255 ) );
@@ -238,17 +245,21 @@
         std::string regbl_export_deduce;
 
         /* importation token */
-        std::string regbl_area;
         std::string regbl_year;
         std::string regbl_udeduce;
         std::string regbl_ldeduce;
+        std::string regbl_void;
 
         /* importation token */
+        int regbl_area( -1 );
+        int regbl_size( -1 );
         int regbl_flag( -1 );
 
         /* importation token */
         double regbl_posx( 0. );
         double regbl_posy( 0. );
+        double regbl_detx( 0. );
+        double regbl_dety( 0. );
 
         /* factor value */
         double regbl_factor( 0. );
@@ -277,7 +288,7 @@
         cv::Mat regbl_aref;
 
         /* storage list */
-        lc_list regbl_list;
+        lc_list_t regbl_list;
 
         /* building database stream */
         std::ifstream regbl_input;
@@ -376,20 +387,6 @@
         }
 
         /* compose path */
-        regbl_export_surface = std::string( regbl_storage_path ) + "/regbl_output/output_surface";
-
-        /* check consistency */
-        if ( std::filesystem::is_directory( regbl_export_surface ) == false ) {
-
-            /* display message */
-            std::cerr << "error : unable to locate surface directory" << std::endl;
-
-            /* send message */
-            return( 1 );
-
-        }
-
-        /* compose path */
         regbl_export_deduce = std::string( regbl_storage_path ) + "/regbl_output/output_deduce";
 
         /* check consistency */
@@ -403,25 +400,65 @@
 
         }
 
-        /* create surface stream */
-        regbl_surface.open( regbl_export_surface + "/" + std::string( regbl_building_id ), std::ifstream::in );
+        /* create reference stream */
+        regbl_reference.open( regbl_export_reference + "/" + std::string( regbl_building_id ), std::ifstream::in );
 
-        /* check input stream */
-        if ( regbl_surface.is_open() == false ) {
+        /* check reference stream */
+        if ( regbl_reference.is_open() == false ) {
+
+            /* assign no reference flag */
+            regbl_year = "NO_REF";
+
+        } else {
+
+            /* import reference date */
+            regbl_reference >> regbl_year;
+
+            /* delete reference stream */
+            regbl_reference.close();
+
+        }
+
+        /* create deduction stream */
+        regbl_deduce.open( regbl_export_deduce + "/" + std::string( regbl_building_id ), std::ifstream::in );
+
+        /* check deduction stream */
+        if ( regbl_deduce.is_open() == false ) {
 
             /* display message */
-            std::cerr << "error : unable to locate surface file" << std::endl;
+            std::cerr << "error : unable to import building deduced range" << std::endl;
 
             /* send message */
             return( 1 );
 
+        } else {
+
+            /* import deduced range */
+            regbl_deduce >> regbl_udeduce >> regbl_ldeduce;
+
+            /* delete deduction stream */
+            regbl_deduce.close();
+
         }
 
-        /* import surface value */
-        regbl_surface >> regbl_area;
+        /* create surface stream */
+        regbl_surface.open( std::string( regbl_storage_path ) + "/regbl_output/output_surface/" + std::string( regbl_building_id ), std::ifstream::in );
 
-        /* delete surface stream */
-        regbl_surface.close();
+        /* check input stream */
+        if ( regbl_surface.is_open() == false ) {
+
+            /* display warning */
+            std::cerr << "warning : building surface file not found : surface not displayed" << std::endl;
+
+        } else {
+
+            /* import surface value */
+            regbl_surface >> regbl_area;
+
+            /* delete surface stream */
+            regbl_surface.close();
+
+        }
 
         /* create input stream */
         regbl_input.open( regbl_export_detect + "/" + std::string( regbl_building_id ), std::ifstream::in );
@@ -438,7 +475,7 @@
         }
 
         /* input stream parsing */
-        while ( regbl_input >> regbl_year >> regbl_flag ) {
+        while ( regbl_input >> regbl_year >> regbl_flag >> regbl_detx >> regbl_dety >> regbl_size  ) {
 
             /* create position stream */
             regbl_position.open( regbl_export_position + "/" + regbl_year + "/" + std::string( regbl_building_id ), std::ifstream::in );
@@ -458,10 +495,11 @@
             if ( regbl_position >> regbl_posx >> regbl_posy ) {
 
                 /* compute metric factor */
-                regbl_factor = std::stod( regbl_list[regbl_index][5] ) / ( std::stod( regbl_list[regbl_index][2] ) - std::stod( regbl_list[regbl_index][1] ) );
+                regbl_factor = lc_list_metric_to_pixel( regbl_list, regbl_index ); //std::stod( regbl_list[regbl_index][5] ) / ( std::stod( regbl_list[regbl_index][2] ) - std::stod( regbl_list[regbl_index][1] ) );
 
                 /* invert y coordinate */
                 regbl_posy = std::stod( regbl_list[regbl_index][6] ) - regbl_posy - 1;
+                regbl_dety = std::stod( regbl_list[regbl_index][6] ) - regbl_dety - 1;
 
                 /* compose cropping coordinates */
                 regbl_clx = std::round( regbl_posx ) - REGBL_TRACKER_CROPHALF;
@@ -532,10 +570,13 @@
                 regbl_tracker_crop( regbl_crop, regbl_cnx, regbl_cny, regbl_flag );
 
                 /* draw building and entries */
-                regbl_tracker_building( regbl_crop, regbl_cnx, regbl_cny, regbl_position, regbl_flag );
+                regbl_tracker_building( regbl_crop, regbl_cnx, regbl_cny, regbl_position );
 
                 /* draw building surface */
-                regbl_tracker_surface( regbl_crop, regbl_cnx, regbl_cny, regbl_area, regbl_factor, regbl_flag );
+                regbl_tracker_surface( regbl_crop, regbl_cnx, regbl_cny, regbl_area * regbl_factor );
+
+                /* display detection information */
+                regbl_tracker_detect( regbl_crop, regbl_cnx + ( regbl_detx - regbl_posx ), regbl_cny + ( regbl_dety - regbl_posy ), regbl_size, regbl_flag );
 
                 /* check accumulator state */
                 if ( regbl_ftln.empty() == true ) {
@@ -571,10 +612,13 @@
                 regbl_tracker_crop( regbl_crop, regbl_cnx, regbl_cny, regbl_flag );
 
                 /* draw building and entries */
-                regbl_tracker_building( regbl_crop, regbl_cnx, regbl_cny, regbl_position, regbl_flag );
+                regbl_tracker_building( regbl_crop, regbl_cnx, regbl_cny, regbl_position );
 
                 /* draw building surface */
-                regbl_tracker_surface( regbl_crop, regbl_cnx, regbl_cny, regbl_area, regbl_factor, regbl_flag );
+                regbl_tracker_surface( regbl_crop, regbl_cnx, regbl_cny, regbl_area * regbl_factor );
+
+                /* display detection information */
+                regbl_tracker_detect( regbl_crop, regbl_cnx + ( regbl_detx - regbl_posx ), regbl_cny + ( regbl_dety - regbl_posy ), regbl_size, regbl_flag );
 
                 /* check accumulator state */
                 if ( regbl_stln.empty() == true ) {
@@ -590,7 +634,7 @@
                 }
 
                 /* create timeline */
-                regbl_crop = regbl_tracker_timeline( regbl_crop.cols, regbl_year, regbl_flag );
+                regbl_crop = regbl_tracker_timeline( regbl_crop.cols, regbl_year, regbl_flag, regbl_year == regbl_ldeduce, regbl_year == regbl_udeduce );
 
                 /* check accumulator state */
                 if ( regbl_alin.empty() == true ) {
@@ -623,44 +667,8 @@
 
         }
 
-        /* create reference stream */
-        regbl_reference.open( regbl_export_reference + "/" + std::string( regbl_building_id ), std::ifstream::in );
-
-        /* check reference stream */
-        if ( regbl_reference.is_open() == false ) {
-
-            /* assign no reference flag */
-            regbl_year = "NO_REF";
-
-        } else {
-
-            /* import reference date */
-            regbl_reference >> regbl_year;
-
-            /* delete reference stream */
-            regbl_reference.close();
-
-        }
-
-        /* create deduction stream */
-        regbl_deduce.open( regbl_export_deduce + "/" + std::string( regbl_building_id ), std::ifstream::in );
-
-        /* check deduction stream */
-        if ( regbl_deduce.is_open() == false ) {
-
-            /* display message */
-            std::cerr << "error : unable to import building deduced range" << std::endl;
-
-            /* send message */
-            return( 1 );
-
-        }
-
-        /* import deduced range */
-        regbl_deduce >> regbl_udeduce >> regbl_ldeduce;
-
-        /* delete deduction stream */
-        regbl_deduce.close();
+        /* delete input stream */
+        regbl_input.close();
 
         /* compose reference bar */
         regbl_aref = regbl_tracker_reference( regbl_ftln.cols, std::string( regbl_building_id ), regbl_year, regbl_udeduce, regbl_ldeduce );
@@ -671,10 +679,7 @@
         cv::vconcat( regbl_ftln, regbl_aref, regbl_ftln );
 
         /* export result */
-        cv::imwrite( std::string( regbl_output_path ) + "/" + std::string( regbl_building_id ) + ".jpg", regbl_ftln );
-
-        /* delete input stream */
-        regbl_input.close();
+        cv::imwrite( std::string( regbl_output_path ) + "/" + std::string( regbl_building_id ) + ".png", regbl_ftln );
 
         /* send message */
         return( 0 );

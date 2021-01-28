@@ -21,11 +21,14 @@
 
     # include "regbl-detect.hpp"
 
+    /* temporary */
+    cv::Mat regbl_mask;
+
 /*
     source - Detection methods
  */
 
-    bool regbl_detect_on_map( cv::Mat & regbl_map, double const regbl_x, double const regbl_y ) {
+    bool regbl_detect_on_map( cv::Mat & regbl_map, double * const regbl_x, double * const regbl_y ) {
 
         /* detection cross pattern */
         static const int regbl_cross[5][2] = {
@@ -46,8 +49,8 @@
         for ( int regbl_i = 0; regbl_i < 5; regbl_i ++ ) {
 
             /* compute detection coordinates */
-            regbl_u = regbl_x + regbl_cross[regbl_i][0] * REGBL_DETECT_CROSS;
-            regbl_v = regbl_y + regbl_cross[regbl_i][1] * REGBL_DETECT_CROSS;
+            regbl_u = ( * regbl_x ) + regbl_cross[regbl_i][0] * REGBL_DETECT_CROSS;
+            regbl_v = ( * regbl_y ) + regbl_cross[regbl_i][1] * REGBL_DETECT_CROSS;
 
             /* check coordinates */
             if ( regbl_u < 0 ) continue;
@@ -59,6 +62,10 @@
 
             /* formal detection */
             if ( regbl_map.at<uchar>( regbl_v, regbl_u ) < 127.5 ) {
+
+                /* assign formal detection position */
+                ( * regbl_x ) = regbl_u;
+                ( * regbl_y ) = regbl_v;
 
                 /* send results */
                 return( true );
@@ -125,11 +132,11 @@
                 regbl_found = 0;
                 regbl_total = 0;
 
-                /* parsing position - need to bring back all position consideration */
-                if ( regbl_input >> regbl_x >> regbl_y ) {
+                /* parsing position - need to bring back all position consideration - allows only single detection */
+                if ( ( regbl_input >> regbl_x >> regbl_y ) && ( regbl_found == 0 ) ) {
 
                     /* detection on map */
-                    if ( regbl_detect_on_map( regbl_map, regbl_x, regbl_y ) == true ) {
+                    if ( regbl_detect_on_map( regbl_map, & regbl_x, & regbl_y ) == true ) {
 
                         /* update statistic */
                         regbl_found ++;
@@ -164,6 +171,9 @@
 
                 } else {
 
+/* experimental */
+int regbl_size( lc_connect_get_size( regbl_map, regbl_mask, std::round( regbl_x ), std::round( regbl_y ), true ) );
+
                     /* create output stream */
                     regbl_output.open( regbl_export_detect + "/" + regbl_egid, std::ofstream::app );
 
@@ -179,7 +189,7 @@
                     }
 
                     /* export detection result */
-                    regbl_output << regbl_year << ( ( regbl_found > 0 ) ? " 1" : " 0" ) << std::endl;
+                    regbl_output << regbl_year << ( ( regbl_found > 0 ) ? " 1 " : " 0 " ) << regbl_x << " " << regbl_y << " " << regbl_size << std::endl;
 
                     /* delete output stream */
                     regbl_output.close();
@@ -215,7 +225,7 @@
         cv::Mat regbl_track;
 
         /* storage list */
-        lc_list regbl_list;
+        lc_list_t regbl_list;
 
         /* check path specification */
         if ( regbl_storage_path == NULL ) {
@@ -257,7 +267,7 @@
         }
 
         /* compose path */
-        regbl_export_position = std::string( regbl_storage_path ) + "/regbl_output/output_position/";
+        regbl_export_position = std::string( regbl_storage_path ) + "/regbl_output/output_position";
 
         /* check consistency */
         if ( std::filesystem::is_directory( regbl_export_position ) == false ) {
@@ -338,6 +348,9 @@
                     return( 1 );
 
                 }
+
+/* experimental */
+regbl_mask = cv::Mat( regbl_map.rows, regbl_map.cols, CV_8UC1, cv::Scalar( 0 ) );
 
                 /* invert map y-axis - fit northing coordinates direction */
                 cv::flip( regbl_map, regbl_map, 0 );

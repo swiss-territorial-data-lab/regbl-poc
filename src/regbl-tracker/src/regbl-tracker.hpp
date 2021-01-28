@@ -91,15 +91,19 @@
 
     /*! ... */
 
-    void regbl_tracker_building( cv::Mat & regbl_crop, int const regbl_cnx, int const regbl_cny, std::ifstream & regbl_stream, int const regbl_detect );
+    void regbl_tracker_building( cv::Mat & regbl_crop, int const regbl_cnx, int const regbl_cny, std::ifstream & regbl_stream );
 
     /*! ... */
 
-    void regbl_tracker_surface( cv::Mat & regbl_crop, int const regbl_cnx, int const regbl_cny, std::string regbl_surface, double const regbl_factor, int const regbl_detect );
+    void regbl_tracker_surface( cv::Mat & regbl_crop, int const regbl_cnx, int const regbl_cny, double const regbl_surface );
 
     /*! ... */
 
-    cv::Mat regbl_tracker_timeline( int const regbl_width, std::string regbl_year, int const regbl_detect );
+    void regbl_tracker_detect( cv::Mat & regbl_crop, double const regbl_dx, double const regbl_dy, double const regbl_size, bool const regbl_detect );
+
+    /*! ... */
+
+    cv::Mat regbl_tracker_timeline( int const regbl_width, std::string regbl_year, int const regbl_detect, bool const regbl_lbound, bool const regbl_ubound );
 
     /*! ... */
 

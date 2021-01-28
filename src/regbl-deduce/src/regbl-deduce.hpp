@@ -62,9 +62,15 @@
     header - preprocessor definitions
  */
 
+    /* define surface ratio threshold - @devs : magic value */
+    # define REGBL_DEDUCE_RATIO ( 4.0 )
+
 /*
     header - preprocessor macros
  */
+
+    /* computation of ration always greater or equal to one */
+    # define regbl_ratio(u,v) ( ( ( u ) > ( v ) ) ? ( u ) / ( v ) : ( v ) / ( u ) )
 
 /*
     header - type definition

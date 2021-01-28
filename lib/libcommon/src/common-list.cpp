@@ -25,10 +25,10 @@
     source - conversion methods
  */
 
-    lc_list lc_list_import( std::string const lc_path ) {
+    lc_list_t lc_list_import( std::string const lc_path ) {
 
         /* returned list */
-        lc_list lc_return;
+        lc_list_t lc_return;
 
         /* importation buffer */
         std::vector < std::string > lc_buffer(7);
@@ -57,6 +57,17 @@
 
         /* return list */
         return( lc_return );
+
+    }
+
+    double lc_list_metric_to_pixel( lc_list_t & lc_list, int const lc_index ) {
+
+        /* range values */
+        double lc_georange( std::stod( lc_list[lc_index][2] ) - std::stod( lc_list[lc_index][1] ) );
+        double lc_pixrange( std::stod( lc_list[lc_index][5] ) );
+
+        /* compute and return factor */
+        return( lc_pixrange / lc_georange );
 
     }
 

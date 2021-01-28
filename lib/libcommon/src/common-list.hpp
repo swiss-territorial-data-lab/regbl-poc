@@ -58,7 +58,7 @@
     header - type definition
  */
 
-    typedef std::vector < std::vector< std::string > > lc_list;
+    typedef std::vector < std::vector< std::string > > lc_list_t;
 
 /*
     header - structures
@@ -70,7 +70,11 @@
 
     /*! ... */
 
-    lc_list lc_list_import( std::string const lc_path );
+    lc_list_t lc_list_import( std::string const lc_path );
+
+    /*! ... */
+
+    double lc_list_metric_to_pixel( lc_list_t & lc_list, int const lc_index );
 
 /*
     header - inclusion guard

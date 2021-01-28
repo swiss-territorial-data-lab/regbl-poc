@@ -65,7 +65,7 @@
     header - preprocessor definitions
  */
 
-    /* define detection cross size */
+    /* define detection cross size - @devs : magic number */
     # define REGBL_DETECT_CROSS ( 3 )
 
 /*
@@ -86,7 +86,7 @@
 
     /*! ... */
 
-    bool regbl_detect_on_map( cv::Mat & regbl_map, double const regbl_x, double const regbl_y );
+    bool regbl_detect_on_map( cv::Mat & regbl_map, double * const regbl_x, double * const regbl_y );
 
     /*! \brief Processing methods (un-synchronised)
      *
