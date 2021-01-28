@@ -29,8 +29,8 @@ endif
 endif
     MAKE_CDOC:=doxygen
 
-    MAKE_FCMP:=-std=c++11 -O3 -Wall -Wno-deprecated -funsigned-char -flto
-    MAKE_FLNK:=-flto
+    MAKE_FCMP:=-std=c++17 -O3 -Wall -Wno-deprecated -funsigned-char -flto -I /usr/include/opencv4
+    MAKE_FLNK:=-flto -lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_ml -lopencv_video -lopencv_features2d -lopencv_calib3d -lopencv_objdetect -lopencv_stitching -lopencv_imgcodecs -L/usr/local/lib/
 
 #
 #   makefile - configuration

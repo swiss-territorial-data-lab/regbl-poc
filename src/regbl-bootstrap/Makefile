@@ -29,7 +29,7 @@ endif
 endif
     MAKE_CDOC:=doxygen
 
-    MAKE_FCMP:=-std=c++17 -O3 -Wall -Wno-deprecated -funsigned-char -fopenmp -flto
+    MAKE_FCMP:=-std=c++17 -O3 -Wall -Wno-deprecated -funsigned-char -fopenmp -flto -I /usr/include/opencv4
     MAKE_FLNK:=-lgomp -flto
 
 #

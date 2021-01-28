@@ -65,11 +65,8 @@
     header - preprocessor definitions
  */
 
-    /* define string buffer length */
-    # define REGBL_BUFFER 8192
-
-    /* define delimiter */
-    # define REGBL_DELIMITER '\t'
+    /* define detection cross size */
+    # define REGBL_DETECT_CROSS ( 3 )
 
 /*
     header - preprocessor macros
@@ -89,7 +86,7 @@
 
     /*! ... */
 
-    bool regbl_detect_on_map( cv::Mat & regbl_map, double const regbl_x, double const regbl_y, double const regbl_size );
+    bool regbl_detect_on_map( cv::Mat & regbl_map, double const regbl_x, double const regbl_y );
 
     /*! \brief Processing methods (un-synchronised)
      *

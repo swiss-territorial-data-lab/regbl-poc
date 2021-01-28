@@ -25,7 +25,7 @@
     source - Detection methods
  */
 
-    bool regbl_detect_on_map( cv::Mat & regbl_map, double const regbl_x, double const regbl_y, double const regbl_size ) {
+    bool regbl_detect_on_map( cv::Mat & regbl_map, double const regbl_x, double const regbl_y ) {
 
         /* detection cross pattern */
         static const int regbl_cross[5][2] = {
@@ -46,8 +46,8 @@
         for ( int regbl_i = 0; regbl_i < 5; regbl_i ++ ) {
 
             /* compute detection coordinates */
-            regbl_u = regbl_x + regbl_cross[regbl_i][0] * regbl_size;
-            regbl_v = regbl_y + regbl_cross[regbl_i][1] * regbl_size;
+            regbl_u = regbl_x + regbl_cross[regbl_i][0] * REGBL_DETECT_CROSS;
+            regbl_v = regbl_y + regbl_cross[regbl_i][1] * REGBL_DETECT_CROSS;
 
             /* check coordinates */
             if ( regbl_u < 0 ) continue;
@@ -91,12 +91,9 @@
         double regbl_x( 0. );
         double regbl_y( 0. );
 
-        /* cross size */
-        int regbl_cross( 0 );
-
         /* detection statistic */
-        int regbl_detect( 0 );
-        int regbl_total ( 0 );
+        int regbl_found( 0 );
+        int regbl_total( 0 );
 
         /* cross color */
         cv::Scalar regbl_color;
@@ -125,20 +122,17 @@
                 }
 
                 /* reset statistic */
-                regbl_detect = 0;
+                regbl_found = 0;
                 regbl_total = 0;
 
-                /* reset cross size */
-                regbl_cross = 3;
-
-                /* parsing position */
+                /* parsing position - need to bring back all position consideration */
                 if ( regbl_input >> regbl_x >> regbl_y ) {
 
                     /* detection on map */
-                    if ( regbl_detect_on_map( regbl_map, regbl_x, regbl_y, 3 ) == true ) {
+                    if ( regbl_detect_on_map( regbl_map, regbl_x, regbl_y ) == true ) {
 
                         /* update statistic */
-                        regbl_detect ++;
+                        regbl_found ++;
 
                         /* update color */
                         regbl_color = cv::Scalar( 0, 255, 0, 255 );
@@ -151,14 +145,11 @@
                     }
 
                     /* mark detection on tacking map */
-                    cv::line( regbl_track, cv::Point( regbl_x    , regbl_y - regbl_cross ), cv::Point( regbl_x    , regbl_y + regbl_cross ), regbl_color );
-                    cv::line( regbl_track, cv::Point( regbl_x - regbl_cross, regbl_y     ), cv::Point( regbl_x + regbl_cross, regbl_y     ), regbl_color );
+                    cv::line( regbl_track, cv::Point( regbl_x    , regbl_y - REGBL_DETECT_CROSS ), cv::Point( regbl_x    , regbl_y + REGBL_DETECT_CROSS ), regbl_color );
+                    cv::line( regbl_track, cv::Point( regbl_x - REGBL_DETECT_CROSS, regbl_y     ), cv::Point( regbl_x + REGBL_DETECT_CROSS, regbl_y     ), regbl_color );
 
                     /* update total */
                     regbl_total ++;
-
-                    /* update cross size */
-                    regbl_cross = 1;
 
                 }
 
@@ -188,7 +179,7 @@
                     }
 
                     /* export detection result */
-                    regbl_output << regbl_year << ( ( regbl_detect > 0 ) ? " 1" : " 0" ) << std::endl;
+                    regbl_output << regbl_year << ( ( regbl_found > 0 ) ? " 1" : " 0" ) << std::endl;
 
                     /* delete output stream */
                     regbl_output.close();
