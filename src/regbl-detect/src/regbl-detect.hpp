@@ -86,7 +86,7 @@
 
     /*! ... */
 
-    bool regbl_detect_on_map( cv::Mat & regbl_map, double * const regbl_x, double * const regbl_y );
+    bool regbl_detect_on_map( cv::Mat & regbl_map, int * const regbl_x, int * const regbl_y );
 
     /*! \brief Processing methods (un-synchronised)
      *

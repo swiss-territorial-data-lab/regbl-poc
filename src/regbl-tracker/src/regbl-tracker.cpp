@@ -246,6 +246,7 @@
 
         /* importation token */
         std::string regbl_year;
+        std::string regbl_ryear;
         std::string regbl_udeduce;
         std::string regbl_ldeduce;
         std::string regbl_void;
@@ -407,12 +408,12 @@
         if ( regbl_reference.is_open() == false ) {
 
             /* assign no reference flag */
-            regbl_year = "NO_REF";
+            regbl_ryear = "NO_REF";
 
         } else {
 
             /* import reference date */
-            regbl_reference >> regbl_year;
+            regbl_reference >> regbl_ryear;
 
             /* delete reference stream */
             regbl_reference.close();
@@ -671,7 +672,7 @@
         regbl_input.close();
 
         /* compose reference bar */
-        regbl_aref = regbl_tracker_reference( regbl_ftln.cols, std::string( regbl_building_id ), regbl_year, regbl_udeduce, regbl_ldeduce );
+        regbl_aref = regbl_tracker_reference( regbl_ftln.cols, std::string( regbl_building_id ), regbl_ryear, regbl_udeduce, regbl_ldeduce );
 
         /* compose single representation */
         cv::vconcat( regbl_ftln, regbl_alin, regbl_ftln );
@@ -685,5 +686,4 @@
         return( 0 );
 
     }
-
 

@@ -45,12 +45,14 @@
 
         /* coordinates variable */
         double regbl_x( 0. );
-        double regbl_u( 0. );
         double regbl_y( 0. );
-        double regbl_v( 0. );
+
+        /* coordinates variable */
+        int regbl_u( 0. );
+        int regbl_v( 0. );
 
         /* transfer matrix */
-        std::vector < std::vector< double > > regbl_transfer;
+        std::vector < std::vector< int > > regbl_transfer;
 
         /* exportation stream */
         std::ofstream regbl_output;
@@ -158,14 +160,14 @@
             for ( unsigned int regbl_parse = 0; regbl_parse < regbl_list.size(); regbl_parse ++ ) {
 
                 /* convert coordinate according to current map */
-                regbl_u = ( ( regbl_x - std::stod( regbl_list[regbl_parse][1], nullptr ) ) / ( std::stod( regbl_list[regbl_parse][2], nullptr ) - std::stod( regbl_list[regbl_parse][1], nullptr ) ) ) * std::stod( regbl_list[regbl_parse][5], nullptr );
-                regbl_v = ( ( regbl_y - std::stod( regbl_list[regbl_parse][3], nullptr ) ) / ( std::stod( regbl_list[regbl_parse][4], nullptr ) - std::stod( regbl_list[regbl_parse][3], nullptr ) ) ) * std::stod( regbl_list[regbl_parse][6], nullptr );
+                regbl_u = std::round( ( ( regbl_x - std::stod( regbl_list[regbl_parse][1] ) ) / ( std::stod( regbl_list[regbl_parse][2] ) - std::stod( regbl_list[regbl_parse][1] ) ) ) * std::stod( regbl_list[regbl_parse][5] ) );
+                regbl_v = std::round( ( ( regbl_y - std::stod( regbl_list[regbl_parse][3] ) ) / ( std::stod( regbl_list[regbl_parse][4] ) - std::stod( regbl_list[regbl_parse][3] ) ) ) * std::stod( regbl_list[regbl_parse][6] ) );
 
                 /* check coordinates */
-                if ( ( regbl_u >= 0. ) && ( regbl_u < std::stod( regbl_list[regbl_parse][5], nullptr ) ) && ( regbl_v >= 0. ) && ( regbl_v < std::stod( regbl_list[regbl_parse][6], nullptr ) ) ) {
+                if ( ( regbl_u >= 0. ) && ( regbl_u < std::stoi( regbl_list[regbl_parse][5] ) ) && ( regbl_v >= 0. ) && ( regbl_v < std::stoi( regbl_list[regbl_parse][6] ) ) ) {
 
                     /* add matrix row */
-                    regbl_transfer.push_back( std::vector < double > (2) );
+                    regbl_transfer.push_back( std::vector < int > (2) );
 
                     /* push coordinates */
                     regbl_transfer.back()[0] = regbl_u;
@@ -223,7 +225,7 @@
                     }
 
                     /* export position */
-                    regbl_output << std::fixed << std::setprecision(3) << regbl_transfer[regbl_parse][0] << " " << regbl_transfer[regbl_parse][1] << std::endl;
+                    regbl_output << regbl_transfer[regbl_parse][0] << " " << regbl_transfer[regbl_parse][1] << std::endl;
 
                     /* delete output stream */
                     regbl_output.close();
@@ -300,12 +302,14 @@
 
         /* coordinates variable */
         double regbl_x( 0. );
-        double regbl_u( 0. );
         double regbl_y( 0. );
-        double regbl_v( 0. );
+
+        /* coordinates variable */
+        int regbl_u( 0. );
+        int regbl_v( 0. );
 
         /* transfer matrix */
-        std::vector < std::vector< double > > regbl_transfer;
+        std::vector < std::vector< int > > regbl_transfer;
 
         /* exportation stream */
         std::ofstream regbl_output;
@@ -394,14 +398,14 @@
                         for ( unsigned int regbl_parse = 0; regbl_parse < regbl_list.size(); regbl_parse ++ ) {
 
                             /* convert coordinate according to current map */
-                            regbl_u = ( ( regbl_x - std::stod( regbl_list[regbl_parse][1], nullptr ) ) / ( std::stod( regbl_list[regbl_parse][2], nullptr ) - std::stod( regbl_list[regbl_parse][1], nullptr ) ) ) * std::stod( regbl_list[regbl_parse][5], nullptr );
-                            regbl_v = ( ( regbl_y - std::stod( regbl_list[regbl_parse][3], nullptr ) ) / ( std::stod( regbl_list[regbl_parse][4], nullptr ) - std::stod( regbl_list[regbl_parse][3], nullptr ) ) ) * std::stod( regbl_list[regbl_parse][6], nullptr );
+                            regbl_u = std::round( ( ( regbl_x - std::stod( regbl_list[regbl_parse][1] ) ) / ( std::stod( regbl_list[regbl_parse][2] ) - std::stod( regbl_list[regbl_parse][1] ) ) ) * std::stod( regbl_list[regbl_parse][5] ) );
+                            regbl_v = std::round( ( ( regbl_y - std::stod( regbl_list[regbl_parse][3] ) ) / ( std::stod( regbl_list[regbl_parse][4] ) - std::stod( regbl_list[regbl_parse][3] ) ) ) * std::stod( regbl_list[regbl_parse][6] ) );
 
                             /* check coordinates */
-                            if ( ( regbl_u >= 0. ) && ( regbl_u < std::stod( regbl_list[regbl_parse][5], nullptr ) ) && ( regbl_v >= 0. ) && ( regbl_v < std::stod( regbl_list[regbl_parse][6], nullptr ) ) ) {
+                            if ( ( regbl_u >= 0. ) && ( regbl_u < std::stoi( regbl_list[regbl_parse][5] ) ) && ( regbl_v >= 0. ) && ( regbl_v < std::stoi( regbl_list[regbl_parse][6] ) ) ) {
 
                                 /* add matrix rows */
-                                regbl_transfer.push_back( std::vector < double > (2) );
+                                regbl_transfer.push_back( std::vector < int > (2) );
 
                                 /* push coordinates */
                                 regbl_transfer.back()[0] = regbl_u;
@@ -432,7 +436,7 @@
                                 }
 
                                 /* export position */
-                                regbl_output << std::fixed << std::setprecision(3) << regbl_transfer[regbl_parse][0] << " " << regbl_transfer[regbl_parse][1] << std::endl;
+                                regbl_output << regbl_transfer[regbl_parse][0] << " " << regbl_transfer[regbl_parse][1] << std::endl;
 
                                 /* delete output stream */
                                 regbl_output.close();

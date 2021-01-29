@@ -27,8 +27,11 @@
 
     unsigned int lc_connect_get_size( cv::Mat & lc_image, cv::Mat & lc_mask, int const lc_x, int const lc_y, bool const lc_erase ) {
 
+        /*  */
+        lc_connect_t lc_area = lc_connect_get( lc_image, lc_mask, lc_x, lc_y, lc_erase );
+
         /* return connected part size */
-        return( lc_connect_get( lc_image, lc_mask, lc_x, lc_y, lc_erase ).size() );
+        return( lc_area.size() );
 
     }
 

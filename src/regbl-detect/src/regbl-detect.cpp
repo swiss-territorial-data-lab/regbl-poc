@@ -28,22 +28,22 @@
     source - Detection methods
  */
 
-    bool regbl_detect_on_map( cv::Mat & regbl_map, double * const regbl_x, double * const regbl_y ) {
+    bool regbl_detect_on_map( cv::Mat & regbl_map, int * const regbl_x, int * const regbl_y ) {
 
         /* detection cross pattern */
         static const int regbl_cross[5][2] = {
 
+            { +0, +0 },
             { -1, +0 },
             { +1, +0 },
-            { +0, +0 },
             { +0, -1 },
             { +0, +1 }
 
         };
 
         /* detection coordinates */
-        double regbl_u( 0. );
-        double regbl_v( 0. );
+        int regbl_u( 0. );
+        int regbl_v( 0. );
         
         /* parsing detection cross */
         for ( int regbl_i = 0; regbl_i < 5; regbl_i ++ ) {
@@ -95,8 +95,8 @@
         std::string regbl_egid;
 
         /* position coordinates */
-        double regbl_x( 0. );
-        double regbl_y( 0. );
+        int regbl_x( 0. );
+        int regbl_y( 0. );
 
         /* detection statistic */
         int regbl_found( 0 );
@@ -172,7 +172,7 @@
                 } else {
 
 /* experimental */
-int regbl_size( lc_connect_get_size( regbl_map, regbl_mask, std::round( regbl_x ), std::round( regbl_y ), true ) );
+int regbl_size( lc_connect_get_size( regbl_map, regbl_mask, regbl_x, regbl_y, true ) );
 
                     /* create output stream */
                     regbl_output.open( regbl_export_detect + "/" + regbl_egid, std::ofstream::app );
