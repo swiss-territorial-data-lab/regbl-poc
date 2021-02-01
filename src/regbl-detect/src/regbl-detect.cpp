@@ -31,13 +31,37 @@
     bool regbl_detect_on_map( cv::Mat & regbl_map, int * const regbl_x, int * const regbl_y ) {
 
         /* detection cross pattern */
-        static const int regbl_cross[5][2] = {
+        static const int regbl_cross[29][2] = {
 
-            { +0, +0 },
+            { -3, +0 },
+            { -2, -2 },
+            { -2, -1 },
+            { -2, +0 },
+            { -2, +1 },
+            { -2, +2 },
+            { -1, -2 },
+            { -1, -1 },
             { -1, +0 },
-            { +1, +0 },
+            { -1, +1 },
+            { -1, +2 },
+            { +0, -3 },
+            { +0, -2 },
             { +0, -1 },
-            { +0, +1 }
+            { +0, +0 },
+            { +0, +1 },
+            { +0, +2 },
+            { +0, +3 },
+            { +1, -2 },
+            { +1, -1 },
+            { +1, +0 },
+            { +1, +1 },
+            { +1, +2 },
+            { +2, -2 },
+            { +2, -1 },
+            { +2, +0 },
+            { +2, +1 },
+            { +2, +2 },
+            { +3, +0 }
 
         };
 
@@ -46,11 +70,11 @@
         int regbl_v( 0. );
         
         /* parsing detection cross */
-        for ( int regbl_i = 0; regbl_i < 5; regbl_i ++ ) {
+        for ( int regbl_i = 0; regbl_i < 29; regbl_i ++ ) {
 
             /* compute detection coordinates */
-            regbl_u = ( * regbl_x ) + regbl_cross[regbl_i][0] * REGBL_DETECT_CROSS;
-            regbl_v = ( * regbl_y ) + regbl_cross[regbl_i][1] * REGBL_DETECT_CROSS;
+            regbl_u = ( * regbl_x ) + regbl_cross[regbl_i][0];
+            regbl_v = ( * regbl_y ) + regbl_cross[regbl_i][1];
 
             /* check coordinates */
             if ( regbl_u < 0 ) continue;

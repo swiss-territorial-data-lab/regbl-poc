@@ -65,7 +65,7 @@
     header - preprocessor definitions
  */
 
-    /* define detection cross size - @devs : magic number */
+    /* define detection cross size */
     # define REGBL_DETECT_CROSS ( 3 )
 
 /*
