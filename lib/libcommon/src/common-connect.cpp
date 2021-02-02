@@ -121,3 +121,15 @@
 
     }
 
+    void lc_connect_set( cv::Mat & lc_image, lc_connect_t & lc_connect ) {
+
+        /* parsing connect component */
+        for ( unsigned int regbl_i = 0; regbl_i < lc_connect.size(); regbl_i ++ ) {
+
+            /* assign value */
+            lc_image.at<uchar>( lc_connect[regbl_i][1], lc_connect[regbl_i][0] ) = 0;
+
+        }
+
+    }
+

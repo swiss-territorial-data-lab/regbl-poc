@@ -86,6 +86,13 @@
 
     lc_connect_t lc_connect_get( cv::Mat & lc_image, cv::Mat & lc_mask, int const lc_x, int const lc_y, bool const lc_erase );
 
+    /*! \brief ...
+     *
+     * lc_image : single channel image
+     */
+
+    void lc_connect_set( cv::Mat & lc_image, lc_connect_t & lc_connect );
+
 /*
     header - inclusion guard
  */

@@ -81,13 +81,15 @@
     header - function prototypes
  */
 
-    int regbl_io_state( cv::Mat & regbl_image, int regbl_state, std::string regbl_path );
+    int regbl_segmentation_io_state( cv::Mat & regbl_image, int regbl_state, std::string regbl_path );
 
-    void regbl_tool_equalize( cv::Mat & regbl_in );
+    void regbl_segmentation_tool_equalize( cv::Mat & regbl_in );
 
-    void regbl_process_extract_black( cv::Mat & regbl_in, cv::Mat & regbl_out, int const regbl_l2dist );
+    void regbl_segmentation_process_extract_black( cv::Mat & regbl_in, cv::Mat & regbl_out, int const regbl_l2dist );
 
-    void regbl_process_conway_iteration( cv::Mat & regbl_in, cv::Mat & regbl_out, int const regbl_kernel, float const regbl_gamevalue );
+    void regbl_segmentation_process_conway_iteration( cv::Mat & regbl_in, cv::Mat & regbl_out, int const regbl_kernel, float const regbl_gamevalue );
+
+    void regbl_segmentation_process_extract_building( cv::Mat & regbl_clean, cv::Mat & regbl_source, cv::Mat & regbl_output, int const regbl_tolerence );
 
     int main( int argc, char ** argv );
 
