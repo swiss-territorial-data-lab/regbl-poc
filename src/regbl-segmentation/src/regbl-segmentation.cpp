@@ -138,7 +138,7 @@
     void regbl_segmentation_process_conway_iteration( cv::Mat & regbl_in, cv::Mat & regbl_out, int const regbl_kernel, float const regbl_gamevalue ) {
 
         /* initialise output matrix */
-        regbl_out = cv::Mat( cv::Size( regbl_in.cols, regbl_in.rows ), CV_8UC1, cv::Scalar(255));
+        regbl_out = cv::Mat( cv::Size( regbl_in.cols, regbl_in.rows ), CV_8UC1, cv::Scalar(255) );
 
         /* kernel boundaries */
         int regbl_lx( 0 );
@@ -212,7 +212,7 @@
     void regbl_segmentation_process_extract_building( cv::Mat & regbl_clean, cv::Mat & regbl_source, cv::Mat & regbl_output, int const regbl_tolerence ) {
 
         /* tracker maps */
-        cv::Mat regbl_tracker( cv::Size( regbl_source.cols, regbl_source.rows ), CV_8UC1, cv::Scalar(0));
+        cv::Mat regbl_tracker( cv::Size( regbl_source.cols, regbl_source.rows ), CV_8UC1, cv::Scalar(0) );
 
         /* connected component */
         lc_connect_t regbl_component;
@@ -278,6 +278,9 @@
                                     }
 
                                 }
+
+                                /* validate central pixel */
+                                regbl_output.at<uchar>( regbl_component[regbl_i][1], regbl_component[regbl_i][0] ) = 0;
 
                             }
 
@@ -395,6 +398,7 @@
             regbl_state = regbl_segmentation_io_state( regbl_swap, regbl_state, std::string( regbl_state_path ) );
 
         }
+
 
         /* extraction of buildings - @devs : the last parameter (2) is a magical parameter, which should be equal or similar to the one above */
         regbl_segmentation_process_extract_building( regbl_swap, regbl_source, regbl_binary, 2 );
