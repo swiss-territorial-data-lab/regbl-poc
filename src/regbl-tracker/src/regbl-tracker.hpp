@@ -103,7 +103,11 @@
 
     /*! ... */
 
-    cv::Mat regbl_tracker_timeline( int const regbl_width, std::string regbl_year, int const regbl_detect, bool const regbl_lbound, bool const regbl_ubound );
+    cv::Mat regbl_tracker_timeline( int const regbl_width, std::string regbl_year, int const regbl_detect );
+
+    /*! ... */
+
+    cv::Mat regbl_tracker_detection( int const regbl_width, std::string regbl_year, std::string regbl_hbound );
 
     /*! ... */
 

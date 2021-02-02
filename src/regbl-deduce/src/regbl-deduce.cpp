@@ -103,10 +103,10 @@
                         if ( regbl_ratio( regbl_push, regbl_size ) > REGBL_DEDUCE_RATIO ) {
 
                             /* export detected building date range boundary */
-                            //regbl_output << regbl_memory << " " << regbl_date;
+                            regbl_output << regbl_memory << " " << regbl_date;
 
                             /* update detection state */
-                            //regbl_detected = true;
+                            regbl_detected = true;
 
                         }
 

@@ -28,20 +28,7 @@
     void regbl_tracker_crop( cv::Mat & regbl_crop, int const regbl_cnx, int const regbl_cny, int const regbl_detect ) {
 
         /* color value */
-        cv::Scalar regbl_color;
-
-        /* check detection result */
-        if ( regbl_detect == 0 ) {
-
-            /* assign color */
-            regbl_color = cv::Scalar( 78, 66, 192 );
-
-        } else {
-
-            /* assign color */
-            regbl_color = cv::Scalar( 98, 142, 22 );
-
-        }
+        cv::Scalar regbl_color( ( regbl_detect == 0 ) ? cv::Scalar( 78, 66, 192 ) : cv::Scalar( 98, 142, 22 ) );
 
         /* draw edge overlay */
         cv::rectangle( regbl_crop, cv::Rect( 0, -1, regbl_crop.cols, regbl_crop.rows + 2 ), regbl_color, 1 );
@@ -130,52 +117,45 @@
 
     }
 
-    cv::Mat regbl_tracker_timeline( int const regbl_width, std::string regbl_year, int const regbl_detect, bool const regbl_lbound, bool const regbl_ubound ) {
+    cv::Mat regbl_tracker_timeline( int const regbl_width, std::string regbl_year, int const regbl_detect ) {
 
         /* text shift value */
         int regbl_shift( ( regbl_width - ( REGBL_TRACKER_CROPHALF * 2 ) ) / 2 );
 
         /* color value */
+        cv::Scalar regbl_color( ( regbl_detect == 0 ) ? cv::Scalar( 78, 66, 192 ) : cv::Scalar( 98, 142, 22 ) );
+
+        /* returned matrix */
+        cv::Mat regbl_return( 18, regbl_width, CV_8UC3, regbl_color );
+
+        /* display crop date */
+        cv::putText( regbl_return, regbl_year, cv::Point( 40 + regbl_shift, 14 ), cv::FONT_HERSHEY_PLAIN, 1, cv::Scalar( 255, 255, 255 ) );
+
+        /* return matrix */
+        return( regbl_return );
+
+    }
+
+    cv::Mat regbl_tracker_detection( int const regbl_width, std::string regbl_year, std::string regbl_hbound ) {
+
+        /* color value */
         cv::Scalar regbl_color;
 
         /* check detection result */
-        if ( regbl_detect == 0 ) {
+        if ( std::stoi( regbl_year ) >= std::stoi( regbl_hbound ) ) {
 
             /* assign color */
-            regbl_color = cv::Scalar( 78, 66, 192 );
+            regbl_color = cv::Scalar( 98, 142, 22 );
 
         } else {
 
             /* assign color */
-            regbl_color = cv::Scalar( 98, 142, 22 );
+            regbl_color = cv::Scalar( 78, 66, 192 );
 
         }
 
         /* returned matrix */
         cv::Mat regbl_return( 18, regbl_width, CV_8UC3, regbl_color );
-
-        /* check bound flag */
-        if ( regbl_ubound == true ) {
-
-            /* display bound */
-            cv::line( regbl_return, cv::Point( 0, 1 ), cv::Point( 0, 16 ), cv::Scalar( 255, 255, 255 ) );
-            cv::line( regbl_return, cv::Point( 0, 8 ), cv::Point( 7,  1 ), cv::Scalar( 255, 255, 255 ) );
-            cv::line( regbl_return, cv::Point( 0, 9 ), cv::Point( 7, 16 ), cv::Scalar( 255, 255, 255 ) );
-
-        }
-
-        /* check bound flag */
-        if ( regbl_lbound == true ) {
-
-            /* display bound */
-            cv::line( regbl_return, cv::Point( regbl_width - 1, 1 ), cv::Point( regbl_width - 1, 16 ), cv::Scalar( 255, 255, 255 ) );
-            cv::line( regbl_return, cv::Point( regbl_width - 1, 8 ), cv::Point( regbl_width - 8,  1 ), cv::Scalar( 255, 255, 255 ) );
-            cv::line( regbl_return, cv::Point( regbl_width - 1, 9 ), cv::Point( regbl_width - 8, 16 ), cv::Scalar( 255, 255, 255 ) );
-
-        }
-
-        /* display crop date */
-        cv::putText( regbl_return, regbl_year, cv::Point( 40 + regbl_shift, 14 ), cv::FONT_HERSHEY_PLAIN, 1, cv::Scalar( 255, 255, 255 ) );
 
         /* return matrix */
         return( regbl_return );
@@ -286,6 +266,7 @@
         cv::Mat regbl_ftln;
         cv::Mat regbl_stln;
         cv::Mat regbl_alin;
+        cv::Mat regbl_adet;
         cv::Mat regbl_aref;
 
         /* storage list */
@@ -635,7 +616,7 @@
                 }
 
                 /* create timeline */
-                regbl_crop = regbl_tracker_timeline( regbl_crop.cols, regbl_year, regbl_flag, regbl_year == regbl_ldeduce, regbl_year == regbl_udeduce );
+                regbl_crop = regbl_tracker_timeline( regbl_crop.cols, regbl_year, regbl_flag );
 
                 /* check accumulator state */
                 if ( regbl_alin.empty() == true ) {
@@ -649,6 +630,23 @@
                     cv::hconcat( regbl_crop, regbl_alin, regbl_alin );
 
                 }
+
+                /* create detection zone */
+                regbl_crop = regbl_tracker_detection( regbl_crop.cols, regbl_year, regbl_udeduce );
+
+                /* check accumulator state */
+                if ( regbl_adet.empty() == true ) {
+
+                    /* bootstrap accumulator */
+                    regbl_adet = regbl_crop;
+
+                } else {
+
+                    /* update accumulator */
+                    cv::hconcat( regbl_crop, regbl_adet, regbl_adet );
+
+                }
+
 
             } else {
 
@@ -675,12 +673,13 @@
         regbl_aref = regbl_tracker_reference( regbl_ftln.cols, std::string( regbl_building_id ), regbl_ryear, regbl_udeduce, regbl_ldeduce );
 
         /* compose single representation */
-        cv::vconcat( regbl_ftln, regbl_alin, regbl_ftln );
-        cv::vconcat( regbl_ftln, regbl_stln, regbl_ftln );
-        cv::vconcat( regbl_ftln, regbl_aref, regbl_ftln );
+        cv::vconcat( regbl_aref, regbl_ftln, regbl_aref );
+        cv::vconcat( regbl_aref, regbl_alin, regbl_aref );
+        cv::vconcat( regbl_aref, regbl_stln, regbl_aref );
+        cv::vconcat( regbl_aref, regbl_adet, regbl_aref );
 
         /* export result */
-        cv::imwrite( std::string( regbl_output_path ) + "/" + std::string( regbl_building_id ) + ".png", regbl_ftln );
+        cv::imwrite( std::string( regbl_output_path ) + "/" + std::string( regbl_building_id ) + ".png", regbl_aref );
 
         /* send message */
         return( 0 );

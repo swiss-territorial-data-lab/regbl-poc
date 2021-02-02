@@ -62,7 +62,7 @@
     header - preprocessor definitions
  */
 
-    /* define surface ratio threshold - @devs : magic value */
+    /* define surface ratio threshold - @devs : magical parameter */
     # define REGBL_DEDUCE_RATIO ( 4.0 )
 
 /*
