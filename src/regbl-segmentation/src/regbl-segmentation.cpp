@@ -74,7 +74,7 @@
     source - processing methods
  */
 
-    void regbl_segmentation_process_extract_black( cv::Mat & regbl_in, cv::Mat & regbl_out, int const regbl_l2dist ) {
+    void regbl_segmentation_process_extract_black( cv::Mat & regbl_in, cv::Mat & regbl_out, int const regbl_l2dist, int const regbl_graylimit ) {
 
         /* gray proximity flag */
         bool regbl_gflag( false );
@@ -109,7 +109,7 @@
                         for ( int regbl_j = regbl_i + 1; regbl_j < 3; regbl_j ++ ) {
 
                             /* component proximity check */
-                            if(std::abs(regbl_in.at<cv::Vec3b>(regbl_y,regbl_x)[regbl_i]-regbl_in.at<cv::Vec3b>(regbl_y,regbl_x)[regbl_j]) > 16) {
+                            if( std::abs( regbl_in.at<cv::Vec3b>(regbl_y,regbl_x)[regbl_i] - regbl_in.at<cv::Vec3b>(regbl_y,regbl_x)[regbl_j] ) > regbl_graylimit ) {
 
                                 /* update proximity flag */
                                 regbl_gflag = false;
@@ -317,9 +317,6 @@
         /* state variable */
         int regbl_state( 1 );
 
-        /* component array */
-        regbl_component_t regbl_component;
-
         /* check consistency */
         if ( ( regbl_input_path == NULL ) || ( regbl_output_path == NULL ) ) {
 
@@ -374,8 +371,8 @@
 
         }
 
-        /* black element extraction - @devs : the last parameter (64) is a magical parameter */
-        regbl_segmentation_process_extract_black( regbl_source, regbl_binary, 64 );
+        /* black element extraction - @devs : the last parameters (64, 16) are magical parameters */
+        regbl_segmentation_process_extract_black( regbl_source, regbl_binary, 64, 16 );
 
         /* check state specification */
         if ( regbl_state_path != NULL ) {
