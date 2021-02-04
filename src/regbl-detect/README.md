@@ -11,7 +11,7 @@ For each building position, a tracker map is updated accroding to the result of 
 &nbsp;
 <img src="../../doc/image/map-basel-2005-tracker-segmented.jpg?raw=true" width="256">
 <br />
-<i>Detection tracker overlay superimposed on original map (left) and pre-processed map (right) </i>
+<i>Detection tracker overlay superimposed on original map (left) and pre-processed map (right) - Swisstopo, 1:25'000 national maps</i>
 </p>
 
 An overlay is exported for each slice of the 3D raster.
@@ -20,6 +20,6 @@ An overlay is exported for each slice of the 3D raster.
 
 The detection process is used in the following way :
 
-    ./regbl-detect -s .../main/directory/path
+    $ ./regbl-detect -s .../main/directory/path
 
 The only parameter is then the main storage directory path. The detection process expects the main storage directory to be bootstraped and filled with the pre-processed maps.

@@ -84,11 +84,53 @@
     header - function prototypes
  */
 
-    /*! ... */
+    /*! \brief Processing methods
+     *
+     * This function is responsible of analysis the detection file associated to
+     * a specific building. Based on the content of the detection file, the
+     * function deduce the most probable construction date of the building.
+     *
+     * The function starts by parsing the years on which the detection was made
+     * and analysis the detection flag. It searches for the longest continuous
+     * sequence of detection flags. As the last detection flag is seen, it uses
+     * it as the upper range boundary of the construction date, the lower range
+     * boundary being the map just before the last detection one.
+     *
+     * In addition, the function uses the surface of the connected area of the
+     * building to detect change in the morphology of the building. If a jump of
+     * the surface value between two detection, the function assumes that the
+     * building was built just after the destruction of an older one.
+     *
+     * In case the building is not detected on the most recent map, it deduces
+     * that the construction date is more recent than the most recent map. The
+     * upper range boundary is then set to +32767.
+     *
+     * In case the building is detected on every map, without break, it deduces
+     * the construction date to be more ancient than the oldest map. The lower
+     * range boundary is set to -32768 in such a case.
+     *
+     * \param regbl_detect Building detection file path
+     * \param regbl_deduce Deduction file exportation path
+     */
 
     void regbl_deduce_detect( std::string regbl_detect, std::string regbl_deduce );
 
-    /*! ... */
+    /*! \brief Main function
+     *
+     * This program is used to perform the formal deduction of the building
+     * construction date based on their detection file :
+     *
+     *     ./regbl-deduce --storage/-s path of the main storage directory
+     *
+     * The main function starts by listing all the available detection files for
+     * the studied geographical area (covered by the 3D raster). For each file,
+     * it applies the deduction process.
+     *
+     * \param argc Standard parameter
+     * \param argv Standard parameter
+     *
+     * \return Exit code
+     */
 
     int main( int argc, char ** argv );
 
