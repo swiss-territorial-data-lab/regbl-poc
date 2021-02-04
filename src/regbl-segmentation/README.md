@@ -6,17 +6,19 @@ The process takes place in steps : considering the following map as an example :
 
 <p align="center">
 <img src="../../doc/image/map-basel-2005.jpg?raw=true" width="256">
+&nbsp;
 <img src="../../doc/image/map-basel-2005-crop.jpg?raw=true" width="256">
 <br />
 <i>Exemple of considered map : Basel in 2005 and closer view - Swisstopo, 1:25'000 national maps</i>
 </p>
 
-The first step consists in image equalization to compensate any biais in their digitization process. This step is optional and has to be specified through a flag to take place. The _exposure_ of the maps are then standardized in such a way.
+The first step consists in image equalization to compensate any bias in their digitization process. This step is optional and has to be specified through a flag to take place. The _exposure_ of the maps are then standardized in such a way.
 
 The next steps consists in black pixel extraction. Each pixel of the input map is tested to determine whether or not it can be considered as black using specific threshold. As the building are drawn in black, extracting blacks pixel is a first way of separating the buildings from the rest of the symbology. The following result is obtained :
 
 <p align="center">
 <img src="../../doc/image/map-basel-2005-black.jpg?raw=true" width="256">
+&nbsp;
 <img src="../../doc/image/map-basel-2005-crop-black.jpg?raw=true" width="256">
 <br />
 <i>Results of the black extraction process</i>
@@ -26,21 +28,23 @@ As one can see on the result of the black extraction process, the building are s
 
 <p align="center">
 <img src="../../doc/image/map-basel-2005-crop-black.jpg?raw=true" width="256">
+&nbsp;
 <img src="../../doc/image/map-basel-2005-crop-conway.jpg?raw=true" width="256">
 <br />
 <i>Results of the morphological operator (right) compare to the previous black extraction (left)</i>
 </p>
 
-As the morphological operator provide the desired result, it also shrinks the footprints of the elements. It allows to eleminate a lot of structure that are not building but it also reduces the footprint of the building, which can increase the amount work to perform by the subsequent processes. To solve this issue and obtain building footprints that are as close as possible to the orignal map, a controlled re-growing step is added. It uses a region threshold and the black extraction result to re-grow the buildings whithout going any further of their original definition. The following images gives a view of the final result along with the original map :
+As the morphological operator provide the desired result, it also shrinks the footprints of the elements. It allows to eliminate a lot of structure that are not building but it also reduces the footprint of the building, which can increase the amount work to perform by the subsequent processes. To solve this issue and obtain building footprints that are as close as possible to the original map, a controlled re-growing step is added. It uses a region threshold and the black extraction result to re-grow the buildings without going any further of their original definition. The following images gives a view of the final result along with the original map :
 
 <p align="center">
 <img src="../../doc/image/map-basel-2005-crop.jpg?raw=true" width="256">
+&nbsp;
 <img src="../../doc/image/map-basel-2005-crop-final.jpg?raw=true" width="256">
 <br />
 <i>Final result of the building footprint extraction (right) compared to the original map</i>
 </p>
 
-As one can see, as the conway morphological operator is not able to get rid of all the non-building elements, such as large and bold texts, the re-growing final step also thinken them. The result of the building extraction then provides very good footprints but without being able to eliminte all the undesired elements.
+As one can see, as the Conway morphological operator is not able to get rid of all the non-building elements, such as large and bold texts, the re-growing final step also thicken them. The result of the building extraction then provides very good footprints but without being able to eliminate all the undesired elements.
 
 ## Usage
 

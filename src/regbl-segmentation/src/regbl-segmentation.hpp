@@ -102,8 +102,8 @@
      * takes place on the luma channel (Y of YUV). The function then starts by
      * converting the image from RGB to YUV.
      *
-     * The luminance is standardiszed in the following way : considering M as
-     * the channel mean value and S its standard deviation, the correction is as
+     * The luma is standardized in the following way : considering M as the
+     * channel mean value and S its standard deviation, the correction is as
      * follows :
      *
      *     Y' = ( ( Y - M ) / S ) * 128 + M
@@ -147,7 +147,7 @@
 
     /*! \brief processing methods
      *
-     * This function implements a variation of the conway game of life as an
+     * This function implements a variation of the Conway game of life as an
      * image processing step (morphological operator). The function expects a
      * single channel binary image {0,255} as input and return, by reference
      * a single channel binary image {0,255}.
@@ -182,7 +182,7 @@
      *
      * Two input image are provided to the function : the cleaned map leaving
      * mostly the buildings and main structures (usually obtained after black
-     * extraction and conway operator) and the source map containing all the
+     * extraction and Conway operator) and the source map containing all the
      * structures (usually obtained after black extraction only).
      *
      * The function starts by extracting connected black component out of the
@@ -234,7 +234,7 @@
      * as black. The result is then a single channel binary image {0,255}.
      *
      * As building on maps are most of the time glued with other elements of the
-     * map, such as roads, train tracks and other buildings, a conway based 
+     * map, such as roads, train tracks and other buildings, a Conway based 
      * morphological operator is used to shrink the black structure, forcing
      * their separation.
      *
