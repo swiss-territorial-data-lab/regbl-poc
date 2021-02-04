@@ -87,11 +87,54 @@
     header - function prototypes
  */
 
-    /*! ... */
+    /*! \brief Extraction methods
+     *
+     * This function is responsible of extracting the information of building in
+     * the RegBL database provided through its path. The function reads the
+     * database entries and filter out the building that are not on the studied
+     * area. The filtering of the building based on their position is made using
+     * the 3D raster descriptor of the studied area.
+     *
+     * For each building, the position (EPSG:2056, E, N), the EGID, the surface
+     * (in square meters) and the construction date (when available) are
+     * extracted. The different information are dispatched and stored to ease
+     * accesses by subsequent processes.
+     *
+     * Both surface value and construction date can be missing for a building.
+     * In such a case, an empty string is exported in the storage file to inform
+     * the lack of information.
+     *
+     * \param regbl_GEB_path         Path of the RegBL GEB DSV file
+     * \param regbl_export_egid      Exportation path for EGID files
+     * \param regbl_export_position  Exportation path for positions
+     * \param regbl_export_reference Exportation path for construction date
+     * \param regbl_export_surface   Exportation path for surface values
+     * \param regbl_list             3D raster descriptor
+     */
 
     void regbl_bootstrap_extract( std::string regbl_GEB_path, std::string regbl_export_egid, std::string regbl_export_position, std::string regbl_export_reference, std::string regbl_export_surface, lc_list_t & regbl_list );
 
-    /*! ... */
+    /*! \brief Extraction methods
+     *
+     * This function is responsible of extracting the position of the building
+     * entries, when available, and to link them to their respective building
+     * using the EGID as link. A geographical filtering is performed to only
+     * consider entries that appear on the 3D raster. This is done using the 3D
+     * raster descriptor.
+     *
+     * This process parses then the RegBL EIN database to extract the entries   
+     * position, taking into account that a building can have no, one or more
+     * entries. The EGID is used to link them to the extraction of building
+     * position.
+     *
+     * It follows that this function will complete the position files computed
+     * by the function regbl_bootstrap_extract(), by appending the position of
+     * the entries to the already computed position file.
+     *
+     * \param regbl_EIN_path         Path of the RegBL EIN DSV file
+     * \param regbl_export_position  Exportation path for positions
+     * \param regbl_list             3D raster descriptor
+     */
 
     void regbl_bootstrap_entries( std::string regbl_EIN_path, std::string regbl_export_egid, std::string regbl_export_position, lc_list_t & regbl_list );
 
@@ -142,7 +185,39 @@
 
     void regbl_detect_database_entry( char const * const regbl_line, int const regbl_target, char * const regbl_token );
 
-    /*! ... */
+    /*! \brief Main function
+     *
+     * This program is used to bootstrap the processing storage structure of a
+     * 3D raster processing for building construction deduction :
+     *
+     *     ./regbl-bootstrap --storage/-s Main storage path
+     *                       --geb/-g RegBL GEB DSV file path
+     *                       --ein/-e RegBL EIN DSV file path
+     *
+     * The first parameter gives the main storage path, that is the directory in
+     * with all the processing steps data will be exported and gathered.
+     *
+     * The two path provided to the program have to point to the GEB and EIN DSV
+     * file of the RegBL database. Be sure to specify the 'Data' one.
+     *
+     * The program then initialises the main storage directory by creating all
+     * the required sub-directories. It then starts reading the GEB database
+     * entries to extract each building position, EGID, construction date and
+     * surface values.
+     *
+     * This done, the program reads the EIN database to extract the available
+     * building entries and links them to their respective building.
+     *
+     * A geographical filtering is performed base on the building position and
+     * on the entries position themselves in order to keep only the building
+     * that appear on each 2D slice of the 3D raster. This program then needs
+     * the 3D raster descriptor to be available in the main storage path.
+     *
+     * \param argc Standard parameter
+     * \param argv Standard parameter
+     *
+     * \return Exit code.
+     */
 
     int main( int argc, char ** argv );
 

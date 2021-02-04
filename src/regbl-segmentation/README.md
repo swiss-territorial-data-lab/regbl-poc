@@ -50,7 +50,7 @@ As one can see, as the Conway morphological operator is not able to get rid of a
 
 The segmentation tool can be used in the following way :
 
-    $ ./regbl_segmentation -i .../source/map.tif -o .../result/export/map.tif [-e] [-i] [-s .../export/steps.tif]
+    $ ./regbl-segmentation -i .../source/map.tif -o .../result/export/map.tif [-e] [-i] [-s .../export/steps.tif]
 
 The first and second parameters simple give the path of the source map to process and the location of the result to export. Any image format accepted by _opencv_ can be considered.
 
