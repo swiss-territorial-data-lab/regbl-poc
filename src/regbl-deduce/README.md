@@ -24,7 +24,7 @@ On the following image, the example of a building showing a change in its morpho
 <i>Example of a simple detection based on building disapearance on the oldest maps</i>
 </p>
 
-This timelines are created using the [_tracker_](../../src/regbl-tracker) tool.
+The change in morphology is detected through the building pixel footprint surface, shown by the green circle. This timelines are created using the [_tracker_](../../src/regbl-tracker) tool.
 
 ## Usage
 

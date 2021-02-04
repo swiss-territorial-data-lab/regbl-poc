@@ -22,7 +22,7 @@
     # include "regbl-tracker.hpp"
 
 /*
-    source - Processing methods
+    source - Rendering methods
  */
 
     void regbl_tracker_crop( cv::Mat & regbl_crop, int const regbl_cnx, int const regbl_cny, int const regbl_detect ) {
