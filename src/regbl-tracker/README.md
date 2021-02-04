@@ -7,7 +7,7 @@ The following image shows and example of such representation for a chosen buildi
 <p align="center">
 <img src="../../doc/image/deduction-example-strict.png?raw=true" width="768">
 <br />
-<i>Example of a computed timeline for a Basel builing</i>
+<i>Example of a computed timeline for a Basel building</i>
 </p>
 
 The two main elements of the timeline are the two succession of crops, centred on the desired building, showing the evolution of its situation across the time. The top timeline uses the original maps to create the crops while the bottom one uses the pre-processed maps. This allows to determine in which extend the pre-processing of the map can be responisble of mistakes.
