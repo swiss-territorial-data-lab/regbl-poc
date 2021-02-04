@@ -181,7 +181,7 @@
                     for ( int v = regbl_ly; v < regbl_hy; v ++ ) {
 
                         /* check region cell state */
-                        if ( regbl_in.at<uchar>(v,u) < 128 ) {
+                        if ( regbl_in.at<uchar>(v,u) == 0 ) {
 
                             /* update counter */
                             regbl_count ++;

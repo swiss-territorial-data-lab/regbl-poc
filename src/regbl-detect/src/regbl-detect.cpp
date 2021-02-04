@@ -85,7 +85,7 @@
             if ( regbl_v >= regbl_map.rows ) continue;
 
             /* formal detection */
-            if ( regbl_map.at<uchar>( regbl_v, regbl_u ) < 127.5 ) {
+            if ( regbl_map.at<uchar>( regbl_v, regbl_u ) == 0 ) {
 
                 /* assign formal detection position */
                 ( * regbl_x ) = regbl_u;

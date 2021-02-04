@@ -80,7 +80,7 @@
                 if ( lc_mask.at<uchar>( lc_v, lc_u ) == 0 ) {
 
                     /* check pixel value */
-                    if ( lc_image.at<uchar>( lc_v, lc_u ) < 127.5 ) {
+                    if ( lc_image.at<uchar>( lc_v, lc_u ) == 0 ) {
 
                         /* push connected element */
                         lc_connect.push_back( std::vector< int > ( 2 ) );

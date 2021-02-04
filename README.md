@@ -37,21 +37,25 @@ The geographical area on which the process has to take place need to be defined.
 
 giving the _easting_ (longitude) and _northing_ (latitude) minimum and maximum values. 
 
-A sequence of historical maps covering the selected area has to be gathered. In the case of this research project, we used the _swisstopo_ 1:25'000 national maps (_KOMB_). We highly recommend to use maps with the same scale and coming with a geographical ratio identical to the ratio of the geographical area (1:1 in terms of _easting_ and _northing_ pixel geographical edges).
+A sequence of historical maps, stored in _geotiff_, covering the selected area has to be gathered. In the case of this research project, we used the _swisstopo_ 1:25'000 national maps (_KOMB_). We highly recommend to use maps with the same scale and coming with a geographical ratio identical to the ratio of the geographical area (1:1 in terms of _easting_ and _northing_ pixel geographical edges).
 
-As an illustration, the following image gives a sample of the maps chosen to cover the _Bern_ area during this research project :
+The source maps have to be cropped according to the defined geographical area. We recommend using the [_GDAL tool_](https://gdal.org/programs/gdalwarp.html) to perform the geographical crop. For the _Bern_ example, one can use :
+
+    $ gdalwarp -of gtiff -te 2596000 1197000 2602000 1203000 source_map.tif [year].tif
+
+The original maps have to be placed in the following directory :
+
+    .../regbl_process/regbl_frame/frame_original/[year].tif (2010.tif, 2004.tif ...)
+
+The _TIFF_ format is mendatory, even the geotiff information are not considered by any of the step-processes.
+
+As an illustration, the following image gives a sample of the maps chosen to cover the _Bern_ area during this research project. As one can see, the maps are square, as the selected geographical area (1:1 pixel edges) :
 
 <p align="center">
 <img src="doc/image/map-bern-timeline.jpg?raw=true" width="768">
 <br />
 <i>Sample of the considered maps of Bern (1993, 1998, 2004, 2010) - swisstopo, 1:25'000 national maps</i>
 </p>
-
-As one can see, the maps are square, as the selected geographical area (1:1 pixel edges). The original maps are placed in the following directory :
-
-    .../regbl_process/regbl_frame/frame_original/[year].tif (2010.tif, 2004.tif ...)
-
-The _TIFF_ format is mendatory, even the geotiff information are not considered by any of the step-processes.
 
 The next step is to apply the [segmentation](src/regbl-segmentation) process on each of the selected map to clean them and extract the pixel footprint of the buildings. The following image gives and illustration of the obtained segmented (pre-processed) maps :
 
