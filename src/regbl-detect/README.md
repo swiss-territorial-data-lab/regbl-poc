@@ -16,6 +16,17 @@ For each building position, a tracker map is updated accroding to the result of 
 
 An overlay is exported for each slice of the 3D raster.
 
+## Program outputs
+
+This program creates and populates the following sub-directories of the main storage directory :
+
+    output_detect   Files named after buildings EGID containg their detection
+    _               summary
+
+    output_frame    Image files containing maps detection overlays
+
+These directories can contains large amount of file, depending on the size and building population of the selected geographical area.
+
 ## Usage
 
 The detection process is used in the following way :

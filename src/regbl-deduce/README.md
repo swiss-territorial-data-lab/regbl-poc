@@ -26,6 +26,15 @@ On the following image, the example of a building showing a change in its morpho
 
 The change in morphology is detected through the building pixel footprint surface, shown by the green circle. This timelines are created using the [_tracker_](../../src/regbl-tracker) tool.
 
+## Program outputs
+
+This program creates and populates the following sub-directories of the main storage directory :
+
+    output_deduce Files named after buildings EGID containing the upper and
+    _             lower construction range boundaries
+
+These directories can contains large amount of file, depending on the size and building population of the selected geographical area.
+
 ## Usage
 
 The construction date program is used in the following way :

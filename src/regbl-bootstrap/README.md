@@ -8,14 +8,23 @@ The _EIN_ database is then read to extract the available position of the buildin
 
 The program also filter the buildings using the definition of the geographical 3D raster used to perform the detection of the construction date. The 3D raster descriptor file is then needed in the main storage directory (*regbl_list* file).
 
-This program create and populates the following sub-directories of the main storage directory :
+## Program outputs
 
-    output_egid            Empty files name after the building EGID
-    output_position/[year] Files named after building EGID containing the position and the position of the entries (when available)
-    output_reference       Files named after building EGID that comes with a construction date in the RegBL database
-    output_surface         Files named after building EGID containing the building surface (when available)
+This program creates and populates the following sub-directories of the main storage directory :
 
-These directory can contains large amount of file, depending on the size and building population of the selected geographical area.
+    output_egid            Empty files name after the buildings EGID
+
+    output_position/[year] Files named after buildings EGID containing their 
+    _                      position and the position of their entries (when 
+    _                      available)
+
+    output_reference       Files named after buildings EGID that comes with a
+    _                      construction date in the RegBL database
+
+    output_surface         Files named after buildings EGID containing the
+    _                      building surface (when available)
+
+These directories can contains large amount of file, depending on the size and building population of the selected geographical area.
 
 ## Usage
 
@@ -23,6 +32,6 @@ The program is used in the following way :
 
     $ ./regbl-bootstrap -s .../main/directory/path -g .../GEB/DSV/file -e .../EIN/DSV/file
 
-The first parameter has to provide the path of the main storage directory in which the 3D raster descriptor can be found (_regbl__list_ file). The directory is then filled with the extracted information, dispatch in their respective sub-directories.
+The first parameter has to provide the path of the main storage directory in which the 3D raster descriptor can be found (_regbl__list_ file). The directory is then filled with the extracted information and dispatched in their respective sub-directories.
 
-The two last parameters have to give the path of the _RegBL_ _GEB_ and _EIN_ _DSV_ files. These file are read to extract the information about the buildings. Be sure to specify the path of the _Data_ _DSV_ file (not the _Readme_ ones).
+The two last parameters have to give the path of the _RegBL_ _GEB_ and _EIN_ _DSV_ files. These file are read to extract the information about the buildings. Be sure to specify the path of the _Data_ _DSV_ files (not the _Readme_ ones).
