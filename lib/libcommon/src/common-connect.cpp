@@ -22,12 +22,12 @@
     # include "common-connect.hpp"
 
 /*
-    source - connectivity methods
+    source - Connectivity methods
  */
 
     unsigned int lc_connect_get_size( cv::Mat & lc_image, cv::Mat & lc_mask, int const lc_x, int const lc_y, bool const lc_erase ) {
 
-        /*  */
+        /* compute connected area */
         lc_connect_t lc_area = lc_connect_get( lc_image, lc_mask, lc_x, lc_y, lc_erase );
 
         /* return connected part size */
@@ -118,18 +118,6 @@
 
         /* return structure */
         return( lc_connect );
-
-    }
-
-    void lc_connect_set( cv::Mat & lc_image, lc_connect_t & lc_connect ) {
-
-        /* parsing connect component */
-        for ( unsigned int regbl_i = 0; regbl_i < lc_connect.size(); regbl_i ++ ) {
-
-            /* assign value */
-            lc_image.at<uchar>( lc_connect[regbl_i][1], lc_connect[regbl_i][0] ) = 0;
-
-        }
 
     }
 

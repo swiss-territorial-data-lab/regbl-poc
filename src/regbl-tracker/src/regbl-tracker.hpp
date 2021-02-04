@@ -153,6 +153,7 @@
      * \param regbl_dy     Building detection position
      * \param regbl_size   Surface of the connected component, in squared pixels
      * \param regbl_detect Building detection flag for the considered map
+     */
 
     void regbl_tracker_detect( cv::Mat & regbl_crop, double const regbl_dx, double const regbl_dy, double const regbl_size, bool const regbl_detect );
 

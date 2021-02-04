@@ -22,7 +22,7 @@
     # include "common-list.hpp"
 
 /*
-    source - conversion methods
+    source - Importation methods
  */
 
     lc_list_t lc_list_import( std::string const lc_path ) {
@@ -59,6 +59,10 @@
         return( lc_return );
 
     }
+
+/*
+    source - Conversion methods
+ */
 
     double lc_list_metric_to_pixel( lc_list_t & lc_list, int const lc_index ) {
 

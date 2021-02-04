@@ -68,11 +68,40 @@
     header - function prototypes
  */
 
-    /*! ... */
+    /*! \brief Importation methods
+     *
+     * This function allows to import the information contained in the main
+     * storage directory 3D raster descriptor file. Such file is used to store
+     * the information needed to perform the building construction deduction
+     * process.
+     *
+     * The descriptor file is a simple file containing lines which describes the
+     * year, geographical boundaries and map pixel size of each slice of the
+     * 3D raster.
+     *
+     * This function allows to simply import the content of the descriptor in a
+     * vector of string vector, each line containing a slice description.
+     *
+     * \param lc_path Path of the 3D raster descriptor file
+     *
+     * \return Returns a vector of string vector containing the content of the
+     * descriptor file in a n by 7 matrix, n being the amount of slices.
+     */
 
     lc_list_t lc_list_import( std::string const lc_path );
 
-    /*! ... */
+    /*! \brief Conversion methods
+     *
+     * This function allows to compute the conversion factor to apply on metric
+     * value to obtain their pixel counterpart on the map designated by a line
+     * of the provdied 3D raster descriptor string matrix.
+     *
+     * \param lc_list  3D raster descriptor string matrix
+     * \param lc_index Index of the slide in the 3D raster descriptor
+     *
+     * \return Returns the metric to pixel conversion factor of the designated
+     * 3D raster slice. 
+     */
 
     double lc_list_metric_to_pixel( lc_list_t & lc_list, int const lc_index );
 

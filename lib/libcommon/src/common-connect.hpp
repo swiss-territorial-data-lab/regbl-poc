@@ -42,7 +42,6 @@
  */
 
     # include <iostream>
-
     # include <vector>
     # include <opencv2/core/core.hpp>
     # include <opencv2/highgui/highgui.hpp>
@@ -70,28 +69,54 @@
     header - function prototypes
  */
 
-    /*! \brief ...
+    /*! \brief Connectivity methods
+     *
+     * This function is a simple front-end to the lc_connect_get() function. It
+     * only uses the returned connected structure to extract it size, in pixels
+     * count and returns it.
      *
      * lc_image and lc_mask : single channel image
      * lc_mask needs to be zero-valued
+     *
+     * \return Size, in pixels, of the connected area.
      */
 
     unsigned int lc_connect_get_size( cv::Mat & lc_image, cv::Mat & lc_mask, int const lc_x, int const lc_y, bool const lc_erase );
 
-    /*! \brief ...
+    /*! \brief Connectivity methods
      *
-     * lc_image and lc_mask : single channel image
-     * lc_mask needs to be zero-valued
+     * This function is used to extract a connected pixel area definition based
+     * on the provided initial pixel. The detection takes place on the provided
+     * image that is expected to be a single-channel binary image {0,255}. The
+     * connected area are always understood as black area (0).
+     *
+     * The process implements a simple neighbour searh of black pixel starting
+     * by the provided one, until the entire area is converted. The coordinates
+     * of each found black pixel are pushed, in x, y order, to the connect
+     * return structure, which is a simple vector of ints vector.
+     *
+     * The function uses a secondary image, also a single-channel binary image
+     * with same size as the image one, that it uses to keep track of the
+     * already selected pixels. A pixel can be selected as part of the connected
+     * area only if it is set to zero on the secondary image. Each time a pixel
+     * is selected, it is whitened on the secondary image, indicating its
+     * selection.
+     *
+     * The secondary image is then updated by the function. The erase flag can
+     * be set to true to ask the function to erase all the update it made on the
+     * seconary image, to keep it in its original state.
+     * 
+     * \param lc_image Source image, single-channel binary image {0,255}
+     * \param lc_mask  Tracking image, single-channel binary image {0,255}
+     * \param lc_x     Initial pixel position
+     * \param lc_y     Initial pixel position
+     * \param lc_erase Trakcer image erasing flag
+     *
+     * \return Returns vector of int vector (n by 2) containing the selected
+     * pixel coordinates.
      */
 
     lc_connect_t lc_connect_get( cv::Mat & lc_image, cv::Mat & lc_mask, int const lc_x, int const lc_y, bool const lc_erase );
-
-    /*! \brief ...
-     *
-     * lc_image : single channel image
-     */
-
-    void lc_connect_set( cv::Mat & lc_image, lc_connect_t & lc_connect );
 
 /*
     header - inclusion guard
