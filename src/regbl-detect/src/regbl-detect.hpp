@@ -84,161 +84,102 @@
     header - function prototypes
  */
 
-    /*! ... */
+    /*! \brief Detection methods
+     *
+     * This function is use to detect the presence or absence of a building on
+     * the provided map. The map is expected to be pre-processed into a binary
+     * image {0,255} on which buildings are specified in black.
+     *
+     * The detection is based on the provided position of the building. As the
+     * position come from the RegBL database, it can be de-synchronised with the
+     * building on the map. The function then uses a detection area to not only
+     * relies on a single pixel to determine the presence of a building.
+     *
+     * The detection area is a simple small circle (hard-coded) around the 
+     * position of the building.
+     *
+     * As the building is detected by the function, the detection pixel is set
+     * in the provided position (provided as pointers). This allows the parent
+     * process to know which pixel lead to the detection.   
+     *
+     * \param regbl_map Pre-processed map, single channel binary image
+     * \param regbl_x   Position of the building, in pixels, (updated with the
+     *                  detection position)
+     * \param regbl_y   Position of the building, in pixels, (updated with the
+     *                  detection position)
+     */
 
     bool regbl_detect_on_map( cv::Mat & regbl_map, int * const regbl_x, int * const regbl_y );
 
-    /*! \brief Processing methods (un-synchronised)
+    /*! \brief Detection methods
      *
-     *  This function performs the actual building detection on the current
-     *  provided map. It uses the map, expected to be pre-processed, colors and
-     *  the building coordinates to decided whether or not the building is
-     *  there.
+     * This function performs the actual building detection on the current
+     * provided map. It uses the map, expected to be a pre-processed binary
+     * image {0,255}, and the building coordinates to decided whether or not
+     * the buildings are there.
      *
-     *  The function starts by reading the header of the DSV database before to
-     *  search for the entries :
+     * Considering the provided map, corresponding to a specific year (slice of
+     * the 3D raster), the function parses all the building files associate to
+     * the map.
      *
-     *      EGID, GKODE, GKODN, GBAUJ
+     * For each building, the function uses the regbl_detect_on_map() function
+     * to determine whether or not the considered building is there. It updates
+     * the tracking overlay to graphically show each detection results (red
+     * cross on missing building, green cross otherwise).
      *
-     *  which corresponds to the ID of the buildings, their coordinates and the
-     *  construction date, when available.
+     * As the building is detected, the function extracts the connected pixel
+     * area based on the detection position.
      *
-     *  As the entries are found in the header, the function starts parsing the
-     *  provided RegBL DSV database segment file. It is parsed line by line,
-     *  each one describing one building.
+     * The function then update the detection file of each building by adding a
+     * new line containing the year of the considered map, the detection result
+     * (detected 1, 0 otherwise) and the formal detection position, in pixels.
      *
-     *  For each building, the function checks if its coordinates are on the map
-     *  or not using the provided boundaries. In case the building is on the
-     *  map, it's coordinates are converted from CH1903+/LV95 to the pixel
-     *  coordinates of the map.
-     *
-     *  Using the pixel coordinates of the building and the map itself, the
-     *  function determine if the building is on the map or not. To do so, the
-     *  color of the underlying pixel at the position of the building is at its
-     *  maximum value (255). In such a case, the detection succeed.
-     *
-     *  For each building, the function uses the provided exportation path to
-     *  create or append to a file the result of the detection. It add a line to
-     *  the file containing the year of the considered map a a zero or a one
-     *  indicating that the building was not found or found, respectively.
-     *
-     *  The result are append in files in order to have the history of the
-     *  detection for each building in a single file. The name of the file is
-     *  set using the considered building unique ID (EGID).
-     *
-     *  In addition, the function also update the map itself to indicate the
-     *  position of each detection and its results. In case the detection
-     *  failed, a 64-valued pixel is set, a 192-valued pixel otherwise. This
-     *  allows to export the map afterwards to have a graphical view of the
-     *  detection.
-     *
-     *  The provided map is expected to be a OpenCV greyscale matrix containing
-     *  only black (0) and white (255) pixel in uint8 (uchar) format. The white
-     *  pixels are used to map building while black ones are used for the rest.
-     *
-     *  \param regbl_database Path of the RegBL DSV database segment file
-     *  \param regbl_map      OpenCV matrix containing the map
-     *  \param regbl_export   Directory in which files are exported
-     *  \param regbl_year     String containing the year of the map
-     *  \param regbl_xmin     Location boundaries coordinate : low E - EPSG:2056
-     *  \param regbl_xmax     Location boundaries coordinate : high E - EPSG:2056
-     *  \param regbl_ymin     Location boundaries coordinate : low N - EPSG:2056
-     *  \param regbl_ymax     Location boundaries coordinate : high N - EPSG:2056
+     * \param regbl_map             Pre-processed map, single channel binary image
+     * \param regbl_track           Tracking overlay image, expected to be an RGBA image
+     * \param regbl_export_egid     EGID files directory
+     * \param regbl_export_position Building position files directory
+     * \param regbl_export_detect   Building detection files directory
+     * \param regbl_year            Year of the provided map (3D raster slice)
      */
 
     void regbl_detect( cv::Mat & regbl_map, cv::Mat & regbl_track, std::string & regbl_export_egid, std::string & regbl_export_position, std::string & regbl_export_detect, std::string & regbl_year );
 
     /*! \brief Main function
      *
-     *  This program is used to detect the presence or absence of building on
-     *  the provided pre-processed geotiff maps. The detection is simply based
-     *  on color values, the pre-processing of the maps being in charge of the
-     *  complex preparation task :
+     * This program is used to detect the presence or absence of building on
+     * the provided pre-processed maps. The detection is a simple pixel-based
+     * detection :
      *
-     *      ./regbl_detect --database/-d [path of the RegBL DSV file]
-     *                     --storage/-s [path of the storage directory]
+     *      ./regbl_detect --storage/-s path of the main storage directory
      *
-     *  The main function starts by reading the arguments and parameters to
-     *  check them. In the provided storage directory, a file named 'regbl_list'
-     *  is opened and is expected to give the location name, the year and the
-     *  map boundaries coordinates, separated by spaces :
+     * The program starts by reading the 3D raster descriptor file located in
+     * the main storage directory. This allows it to get the list of the maps
+     * that are available on this geographical area (3D raster slices).
      *
-     *      bern  2015 2596000 2602000 1197000 1203000
+     * It then load each pre-processed map out of the expected sub-directory of
+     * the main storage directory :
      *
-     *  the coordinates are expected to be in the CH1903+/LV95 with min. and max
-     *  of easting and northing. The list can contain as many entries as it is
-     *  required.
+     *     .../regbl_frame/frame/[year].tif
      *
-     *  The input pre-processed maps are expected to be located in the storage
-     *  directory with path and name :
+     * After checking the map and descriptor consistency, the program prepares
+     * the tracking map and the connected region exclusion map adapted to the
+     * loaded map.
      *
-     *      [storage_directoy]/regbl_frame/frame_[location]/[location]_[year].tif
+     * It then performs the detection of the buildings on the current map. For
+     * each map, the tracking map is exported at the end of the detection as an
+     * overlay to allows it to be superimposed with the pre-processed or 
+     * original maps to visually analyse what happened.
      *
-     *  with location and year as specified in the list.
+     * The overlays are exported in the sub-directory :
      *
-     *  Each map is expected to be a black and white image with building in
-     *  white and the rest (nodata) in black. The image can be a color or simply
-     *  greyscale image.
+     *     .../regbl_output/output_frame/[year].tif
      *
-     *  As the first map is loaded by the main function, the processing of the
-     *  RegBL database DSV file starts. In the first place, only when a new
-     *  location is considered, the database is parsed to find the construction
-     *  date of each building in the base, when available.
+     * which can then be used as overlays on maps.
      *
-     *  The results of this process are exported in the storage directory in the
-     *  following path :
+     * \param argc Standard parameter
+     * \param argv Standard parameter
      *
-     *      [storage_directory]/regbl_output/output_reference/reference_[location]
-     *
-     *  each building construction date is stored in a file named after the
-     *  building RegBL EGID. See :
-     *
-     *      regbl_detect_reference()
-     *
-     *  documentation for more information.
-     *
-     *  For each location and each of its available year, the detection process
-     *  takes place. The RegBL database DSV file is parsed and the coordinates
-     *  of each building is considered for two thing : the first one is to
-     *  determine if the building is in the map boundaries; the second one is
-     *  to detect on the map if the building appears (white pixels) or not.
-     *
-     *  For each building, the result of the detection is stored in the path :
-     *
-     *      [storage_directory]/regbl_output/output_database/database_[location]
-     *
-     *  Again, a file is created for each building using its EGID to name it. As
-     *  the building is detected, the year and a one are exported, the year and
-     *  a zero otherwise. See :
-     *
-     *      regbl_detect()
-     *
-     *  documentation for more information.
-     *
-     *  In addition, the detection process put a mark at each building position
-     *  on the current processed map to indicates whether or not the building
-     *  was found. The update map is then exported in the following directory :
-     *
-     *      [storage_directory]/regbl_output/output_frame/frame_[location]
-     *
-     *  and named :
-     *
-     *      [location]_[year].tif
-     *
-     *  This allows users to check graphically what append during the detection
-     *  process.
-     *
-     *  The main function ends as all the maps specified in the list are fully
-     *  processed and all results exported.
-     *
-     *  Notes on error management : if any file access, in both input and output
-     *  modes fails, the programs displays and error in the standard error and
-     *  stops sending 1 to the system.
-     *
-     *  \param argc Standard main parameter
-     *  \param argv Standard main parameter
-     *
-     *  \return Returns standard system codes.
+     * \return Exit code
      */
 
     int main( int argc, char ** argv );

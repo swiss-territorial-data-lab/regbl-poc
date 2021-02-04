@@ -103,10 +103,6 @@
 
     }
 
-/*
-    source - Detection methods
- */
-
     void regbl_detect( cv::Mat & regbl_map, cv::Mat & regbl_track, std::string & regbl_export_egid, std::string & regbl_export_position, std::string & regbl_export_detect, std::string & regbl_year ) {
 
         /* input stream */
@@ -195,8 +191,8 @@
 
                 } else {
 
-/* experimental */
-int regbl_size( lc_connect_get_size( regbl_map, regbl_mask, regbl_x, regbl_y, true ) );
+                    /* experimental */
+                    int regbl_size( lc_connect_get_size( regbl_map, regbl_mask, regbl_x, regbl_y, true ) );
 
                     /* create output stream */
                     regbl_output.open( regbl_export_detect + "/" + regbl_egid, std::ofstream::app );
@@ -373,8 +369,8 @@ int regbl_size( lc_connect_get_size( regbl_map, regbl_mask, regbl_x, regbl_y, tr
 
                 }
 
-/* experimental */
-regbl_mask = cv::Mat( regbl_map.rows, regbl_map.cols, CV_8UC1, cv::Scalar( 0 ) );
+                /* experimental */
+                regbl_mask = cv::Mat( regbl_map.rows, regbl_map.cols, CV_8UC1, cv::Scalar( 0 ) );
 
                 /* invert map y-axis - fit northing coordinates direction */
                 cv::flip( regbl_map, regbl_map, 0 );
