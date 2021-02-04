@@ -1,12 +1,21 @@
 ## Overview
 
-This tool is used to bootstrap the main storage directory used to perform building construction date base on maps on the defined geographical area.
+This program is used to bootstrap the main storage directory used to perform building construction date base on maps on the defined geographical area.
 
-It starts by creating the required sub-directories before to read the RegBL database. In the first place, the _GEB_ database is read to extract building position, EGID, available construction dates and surfaces. These information are then dispatched in their respective sub-directories to ease their access by subsequent processes.
+It starts by creating the required sub-directories before to read the _RegBL_ database. In the first place, the _GEB_ database is read to extract building position, EGID, available construction dates and surfaces. These information are then dispatched in their respective sub-directories to ease their access by subsequent processes.
 
 The _EIN_ database is then read to extract the available position of the building entries. Building can have no, one or more entries specified in the database. The EGID is used as a link to append the position of the entries to the position of their respective building.
 
-The program also filter the buildings using the definition of the geographical 3D raster used to perform the detection of the construction date. The 3D raster descriptor file is then needed in the main storage directory (_regbl__list_ file).
+The program also filter the buildings using the definition of the geographical 3D raster used to perform the detection of the construction date. The 3D raster descriptor file is then needed in the main storage directory (*regbl_list* file).
+
+This program create and populates the following sub-directories of the main storage directory :
+
+    output_egid            Empty files name after the building EGID
+    output_position/[year] Files named after building EGID containing the position and the position of the entries (when available)
+    output_reference       Files named after building EGID that comes with a construction date in the RegBL database
+    output_surface         Files named after building EGID containing the building surface (when available)
+
+These directory can contains large amount of file, depending on the size and building population of the selected geographical area.
 
 ## Usage
 
