@@ -11,7 +11,7 @@ In case the building is not detected on the most recent map, it is assumed to ha
 On the following timeline of a chosen building, one can see how the deduction algorithm assoicate a construction range based on the disapearance of the building on the oldest maps :
 
 <p align="center">
-<img src="deduction-example-strict.png?raw=true" width="768">
+<img src="../../doc/imagededuction-example-strict.png?raw=true" width="768">
 <br />
 <i>Example of a simple detection based on building disapearance on the oldest maps</i>
 </p>
@@ -19,7 +19,7 @@ On the following timeline of a chosen building, one can see how the deduction al
 On the following image, the example of a building showing a change in its morphology is provided. This illustrate how the detection process interpretes this as a disapearance despite a building continues to be detected on the oldest maps :
 
 <p align="center">
-<img src="deduction-example-break.png?raw=true" width="768">
+<img src="../../doc/imagededuction-example-break.png?raw=true" width="768">
 <br />
 <i>Example of a simple detection based on building disapearance on the oldest maps</i>
 </p>
