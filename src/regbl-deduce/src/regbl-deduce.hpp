@@ -69,7 +69,7 @@
     header - preprocessor macros
  */
 
-    /* computation of ration always greater or equal to one */
+    /* computation of ratio always greater or equal to one */
     # define regbl_ratio(u,v) ( ( ( u ) > ( v ) ) ? ( u ) / ( v ) : ( v ) / ( u ) )
 
 /*

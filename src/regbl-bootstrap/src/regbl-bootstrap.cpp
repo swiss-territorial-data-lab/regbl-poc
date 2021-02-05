@@ -620,17 +620,6 @@
 
         }
 
-        /* check path specification */
-        if ( regbl_EIN_path == NULL ) {
-
-            /* displays message */
-            std::cerr << "error : EIN database path specification" << std::endl;
-
-            /* send message */
-            return( 1 );
-
-        }
-
         /* import storage list */
         regbl_list = lc_list_import( std::string( regbl_storage_path ) + "/regbl_list" );
 
@@ -729,8 +718,18 @@
         /* create main extraction - position, egid, reference */
         regbl_bootstrap_extract( regbl_GEB_path, regbl_export_egid, regbl_export_position, regbl_export_reference, regbl_export_surface, regbl_list );
 
-        /* create secondary extraction - entries position */
-        regbl_bootstrap_entries( regbl_EIN_path, regbl_export_egid, regbl_export_position, regbl_list );
+        /* check if entries database is specified */
+        if ( regbl_EIN_path == NULL ) {
+
+            /* display warning */
+            std::cerr << "warning : EIN database not provided. Ignoring building entries" << std::endl;
+
+        } else {
+
+            /* create secondary extraction - entries position */
+            regbl_bootstrap_entries( regbl_EIN_path, regbl_export_egid, regbl_export_position, regbl_list );
+
+        }
 
         /* send message */
         return( 0 );

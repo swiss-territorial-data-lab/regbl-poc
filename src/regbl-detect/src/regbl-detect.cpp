@@ -21,9 +21,6 @@
 
     # include "regbl-detect.hpp"
 
-    /* temporary */
-    cv::Mat regbl_mask;
-
 /*
     source - Detection methods
  */
@@ -103,7 +100,7 @@
 
     }
 
-    void regbl_detect( cv::Mat & regbl_map, cv::Mat & regbl_track, std::string & regbl_export_egid, std::string & regbl_export_position, std::string & regbl_export_detect, std::string & regbl_year ) {
+    void regbl_detect( cv::Mat & regbl_map, cv::Mat & regbl_track, cv::Mat & regbl_mask, std::string & regbl_export_egid, std::string & regbl_export_position, std::string & regbl_export_detect, std::string & regbl_year ) {
 
         /* input stream */
         std::ifstream regbl_input;
@@ -121,6 +118,12 @@
         /* detection statistic */
         int regbl_found( 0 );
         int regbl_total( 0 );
+
+        /* detection connected area */
+        int regbl_area( 0 );
+
+        /* detection loop flag */
+        bool regbl_flag( true );
 
         /* cross color */
         cv::Scalar regbl_color;
@@ -152,31 +155,45 @@
                 regbl_found = 0;
                 regbl_total = 0;
 
-                /* parsing position - need to bring back all position consideration - allows only single detection */
-                if ( ( regbl_input >> regbl_x >> regbl_y ) && ( regbl_found == 0 ) ) {
+                /* reset loop flag */
+                regbl_flag = true;
 
-                    /* detection on map */
-                    if ( regbl_detect_on_map( regbl_map, & regbl_x, & regbl_y ) == true ) {
+                /* parsing positions */
+                //while ( ( regbl_input >> regbl_x >> regbl_y ) && ( regbl_found == 0 ) ) {
+                while ( ( regbl_flag == true ) && ( regbl_found == 0 ) ) {
 
-                        /* update statistic */
-                        regbl_found ++;
+                    /* import position from file */
+                    if ( regbl_input >> regbl_x >> regbl_y ) {
 
-                        /* update color */
-                        regbl_color = cv::Scalar( 0, 255, 0, 255 );
+                        /* detection on map */
+                        if ( regbl_detect_on_map( regbl_map, & regbl_x, & regbl_y ) == true ) {
+
+                            /* update statistic */
+                            regbl_found ++;
+
+                            /* update color */
+                            regbl_color = cv::Scalar( 0, 255, 0, 255 );
+
+                        } else {
+
+                            /* update color */
+                            regbl_color = cv::Scalar( 0, 0, 255, 255 );
+
+                        }
+
+                        /* mark detection on tacking map */
+                        cv::line( regbl_track, cv::Point( regbl_x    , regbl_y - 3 ), cv::Point( regbl_x    , regbl_y + 3 ), regbl_color );
+                        cv::line( regbl_track, cv::Point( regbl_x - 3, regbl_y     ), cv::Point( regbl_x + 3, regbl_y     ), regbl_color );
+
+                        /* update total */
+                        regbl_total ++;
 
                     } else {
 
-                        /* update color */
-                        regbl_color = cv::Scalar( 0, 0, 255, 255 );
+                        /* update loop flag */
+                        regbl_flag = false;
 
                     }
-
-                    /* mark detection on tacking map */
-                    cv::line( regbl_track, cv::Point( regbl_x    , regbl_y - REGBL_DETECT_CROSS ), cv::Point( regbl_x    , regbl_y + REGBL_DETECT_CROSS ), regbl_color );
-                    cv::line( regbl_track, cv::Point( regbl_x - REGBL_DETECT_CROSS, regbl_y     ), cv::Point( regbl_x + REGBL_DETECT_CROSS, regbl_y     ), regbl_color );
-
-                    /* update total */
-                    regbl_total ++;
 
                 }
 
@@ -191,8 +208,18 @@
 
                 } else {
 
-                    /* experimental */
-                    int regbl_size( lc_connect_get_size( regbl_map, regbl_mask, regbl_x, regbl_y, true ) );
+                    /* check if a detection was made */
+                    if ( regbl_found > 0 ) {
+
+                        /* compute size of the building connected area */
+                        regbl_area = lc_connect_get_size( regbl_map, regbl_mask, regbl_x, regbl_y, true );
+
+                    } else {
+
+                        /* assign a zero size */
+                        regbl_area = 0;
+
+                    }
 
                     /* create output stream */
                     regbl_output.open( regbl_export_detect + "/" + regbl_egid, std::ofstream::app );
@@ -209,7 +236,7 @@
                     }
 
                     /* export detection result */
-                    regbl_output << regbl_year << ( ( regbl_found > 0 ) ? " 1 " : " 0 " ) << regbl_x << " " << regbl_y << " " << regbl_size << std::endl;
+                    regbl_output << regbl_year << ( ( regbl_found > 0 ) ? " 1 " : " 0 " ) << regbl_x << " " << regbl_y << " " << regbl_area << std::endl;
 
                     /* delete output stream */
                     regbl_output.close();
@@ -243,6 +270,7 @@
         /* raster image */
         cv::Mat regbl_map;
         cv::Mat regbl_track;
+        cv::Mat regbl_mask;
 
         /* storage list */
         lc_list_t regbl_list;
@@ -369,7 +397,7 @@
 
                 }
 
-                /* experimental */
+                /* create connected area mask */
                 regbl_mask = cv::Mat( regbl_map.rows, regbl_map.cols, CV_8UC1, cv::Scalar( 0 ) );
 
                 /* invert map y-axis - fit northing coordinates direction */
@@ -379,7 +407,7 @@
                 regbl_track = cv::Mat::zeros( cv::Size( regbl_map.cols, regbl_map.rows ), CV_8UC4 );
 
                 /* perform detection on the map */
-                regbl_detect( regbl_map, regbl_track, regbl_export_egid, regbl_export_position, regbl_export_detect, regbl_list[regbl_parse][0] );
+                regbl_detect( regbl_map, regbl_track, regbl_mask, regbl_export_egid, regbl_export_position, regbl_export_detect, regbl_list[regbl_parse][0] );
 
                 /* invert tracking map y-axis */
                 cv::flip( regbl_track, regbl_track, 0 );

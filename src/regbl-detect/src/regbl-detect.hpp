@@ -65,9 +65,6 @@
     header - preprocessor definitions
  */
 
-    /* define detection cross size */
-    # define REGBL_DETECT_CROSS ( 3 )
-
 /*
     header - preprocessor macros
  */
@@ -132,17 +129,19 @@
      *
      * The function then update the detection file of each building by adding a
      * new line containing the year of the considered map, the detection result
-     * (detected 1, 0 otherwise) and the formal detection position, in pixels.
+     * (detected 1, 0 otherwise), the formal detection position, in pixels, and
+     * the size, in pixels, of the building connected area.
      *
      * \param regbl_map             Pre-processed map, single channel binary image
      * \param regbl_track           Tracking overlay image, expected to be an RGBA image
+     * \param regbl_mask            Tracking image for connected area computation
      * \param regbl_export_egid     EGID files directory
      * \param regbl_export_position Building position files directory
      * \param regbl_export_detect   Building detection files directory
      * \param regbl_year            Year of the provided map (3D raster slice)
      */
 
-    void regbl_detect( cv::Mat & regbl_map, cv::Mat & regbl_track, std::string & regbl_export_egid, std::string & regbl_export_position, std::string & regbl_export_detect, std::string & regbl_year );
+    void regbl_detect( cv::Mat & regbl_map, cv::Mat & regbl_track, cv::Mat & regbl_mask, std::string & regbl_export_egid, std::string & regbl_export_position, std::string & regbl_export_detect, std::string & regbl_year );
 
     /*! \brief Main function
      *
