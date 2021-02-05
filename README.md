@@ -83,7 +83,9 @@ As the main directory is prepared as described, the three successive processing 
 
     $ ./regbl-bootstrap -s .../regbl_process -g .../RegBL/GEB.dsv -e .../RegBL/EIN.dsv
 
-which reads the _RegBL_ _GEB_ and _EIN_ databases to extract the relevant buildings information based on the defined geographical area through the 3D raster descriptor. The [_detection_](src/regbl-detect) process can then takes place :
+which reads the _RegBL_ _GEB_ and _EIN_ databases to extract the relevant buildings information based on the defined geographical area through the 3D raster descriptor. Note that specifying the _EIN_ database is not mandatory. In case the _EIN_ database is not provided, the entries of the buildings are not considered for the deduction of their construction date.
+
+The [_detection_](src/regbl-detect) process can then takes place :
 
     $ ./regbl-detect -s .../regbl_process
 

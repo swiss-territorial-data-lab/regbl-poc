@@ -198,7 +198,10 @@
      * with all the processing steps data will be exported and gathered.
      *
      * The two path provided to the program have to point to the GEB and EIN DSV
-     * file of the RegBL database. Be sure to specify the 'Data' one.
+     * file of the RegBL database. Be sure to specify the 'Data' one. The EIN
+     * database can be omitted. In such a case, the entries of the building are
+     * not extracted, and then, will not be used by any of the subsequent
+     * processes.
      *
      * The program then initialises the main storage directory by creating all
      * the required sub-directories. It then starts reading the GEB database
