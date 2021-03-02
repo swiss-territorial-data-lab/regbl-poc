@@ -24,7 +24,7 @@ The next steps consists in black pixel extraction. Each pixel of the input map i
 <i>Results of the black extraction process</i>
 </p>
 
-As one can see on the result of the black extraction process, the buildings are still highly connected to other symbological elements and to each others in some cases. Having the building footprints well separated and well defined is an important point for subsequent processes responsible of construction data deduction. To achieve it, two steps are added. The first one uses a variation of the Conway game of life to implement a morphological operator able to disconnect pixel groups. The following image gives the results of this separation process along with the previous black extraction result on which it is based :
+As one can see on the result of the black extraction process, the buildings are still highly connected to other symbological elements and to each others in some cases. Having the building footprints well separated and well defined is an important point for subsequent processes responsible of construction years deduction. To achieve it, two steps are added. The first one uses a variation of the Conway game of life to implement a morphological operator able to disconnect pixel groups. The following image gives the results of this separation process along with the previous black extraction result on which it is based :
 
 <p align="center">
 <img src="../../doc/image/map-basel-2005-crop-black.jpg?raw=true" width="256">
@@ -34,7 +34,7 @@ As one can see on the result of the black extraction process, the buildings are 
 <i>Results of the morphological operator (right) compare to the previous black extraction (left)</i>
 </p>
 
-As the morphological operator provide the desired result, it also shrinks the footprint of the elements. It allows to eliminate a lot of structures that are not building but it also reduces the footprint of the buildings themselves, which can increase the amount work to perform by the subsequent processes. To solve this issue and obtain building footprints that are as close as possible to the original map, a controlled re-growing step is added. It uses a region threshold and the black extraction result to re-grow the buildings without going any further of their original definition. The following images gives a view of the final result along with the original map :
+As the morphological operator provide the desired result, it also shrinks the footprint of the elements. It allows to eliminate a lot of structures that are not building but it also reduces the footprint of the buildings themselves, which can increase the amount work to perform by the subsequent processes to properly detect building. To solve this issue and obtain building footprints that are as close as possible to the original map, a controlled re-growing step is added. It uses a region threshold and the black extraction result to re-grow the buildings without going any further of their original definition. The following images gives a view of the final result along with the original map :
 
 <p align="center">
 <img src="../../doc/image/map-basel-2005-crop.jpg?raw=true" width="256">

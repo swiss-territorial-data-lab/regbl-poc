@@ -457,7 +457,7 @@
         }
 
         /* input stream parsing */
-        while ( regbl_input >> regbl_year >> regbl_flag >> regbl_detx >> regbl_dety >> regbl_size  ) {
+        while ( regbl_input >> regbl_year >> regbl_flag >> regbl_detx >> regbl_dety >> regbl_size ) {
 
             /* create position stream */
             regbl_position.open( regbl_export_position + "/" + regbl_year + "/" + std::string( regbl_building_id ), std::ifstream::in );
@@ -477,7 +477,7 @@
             if ( regbl_position >> regbl_posx >> regbl_posy ) {
 
                 /* compute metric factor */
-                regbl_factor = lc_list_metric_to_pixel( regbl_list, regbl_index ); //std::stod( regbl_list[regbl_index][5] ) / ( std::stod( regbl_list[regbl_index][2] ) - std::stod( regbl_list[regbl_index][1] ) );
+                regbl_factor = lc_list_metric_to_pixel( regbl_list, regbl_index );
 
                 /* invert y coordinate */
                 regbl_posy = std::stod( regbl_list[regbl_index][6] ) - regbl_posy - 1;

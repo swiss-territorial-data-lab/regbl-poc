@@ -159,7 +159,6 @@
                 regbl_flag = true;
 
                 /* parsing positions */
-                //while ( ( regbl_input >> regbl_x >> regbl_y ) && ( regbl_found == 0 ) ) {
                 while ( ( regbl_flag == true ) && ( regbl_found == 0 ) ) {
 
                     /* import position from file */
