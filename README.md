@@ -121,7 +121,7 @@ The scripts proposed by the [results and analysis tool](https://github.com/swiss
 
 ## Copyright and License
 
-**regbl-poc** - Nils Hamel, Huriel Richel <br >
+**regbl-poc** - Nils Hamel, Huriel Reichel <br >
 Copyright (c) 2020-2021 Republic and Canton of Geneva
 
 This program is licensed under the terms of the GNU GPLv3. Documentation and illustrations are licensed under the terms of the CC BY 4.0.
